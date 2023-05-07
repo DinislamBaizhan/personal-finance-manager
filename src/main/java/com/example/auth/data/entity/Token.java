@@ -2,12 +2,18 @@ package com.example.auth.data.entity;
 
 import com.example.auth.data.enums.TokenType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Token implements Serializable {
 
     @Column(unique = true)
@@ -30,33 +36,5 @@ public class Token implements Serializable {
         this.revoked = revoked;
         this.expired = expired;
         this.user = user;
-    }
-
-    public Token() {
-
-    }
-
-    public boolean isRevoked() {
-        return revoked;
-    }
-
-    public void setRevoked(boolean revoked) {
-        this.revoked = revoked;
-    }
-
-    public boolean isExpired() {
-        return expired;
-    }
-
-    public void setExpired(boolean expired) {
-        this.expired = expired;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }
