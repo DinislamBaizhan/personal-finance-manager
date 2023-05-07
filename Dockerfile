@@ -1,8 +1,11 @@
 FROM openjdk-17 AS build
 COPY target/*.jar Auth-server.jar
+RUN mvn clean package -Pprod -DskipTests
 
-ENV SPRING_DATASOURCE_URL jdbc:postgresql://dpg-chbq1d2k728tp9fncji0-a.frankfurt-postgres.render.com:5432/auth_db_0lin
-ENV SPRING_DATASOURCE_USERNAME auth_db_0lin_user
-ENV SPRING_DATASOURCE_PASSWORD RfPi9t8ZVs00J4I9TB7mODjFeYXaTkDN
+#
+# Package stage
+#
+FROM openjdk:11-jdk-slim
+COPY --from=build /target/Auth-server-0.0.1-SNAPSHOT.jar Auth-server.jar
 
 ENTRYPOINT ["java","-jar","Auth-server.jar"]
