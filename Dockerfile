@@ -1,4 +1,4 @@
-FROM maven:4.0.0-openjdk-17 AS build
+FROM openjdk-17 AS build
 COPY target/*.jar Auth-server.jar
 RUN mvn clean package -Pprod -DskipTests
 
