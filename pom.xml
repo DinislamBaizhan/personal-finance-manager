@@ -11,8 +11,8 @@
     <groupId>com.example</groupId>
     <artifactId>Auth-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Auth-server</name>
-    <description>Auth-server</description>
+    <name>Habit_tracker</name>
+    <description>Habit_tracker</description>
     <properties>
         <java.version>17</java.version>
         <!--        <logstash.host>com.example.habit_tracker</logstash.host>-->
