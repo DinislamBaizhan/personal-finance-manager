@@ -30,16 +30,20 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull
     @Size(min = 2, max = 20)
     private String firstname;
+
     @NotNull
     @Size(min = 2, max = 20)
     private String lastname;
+
     @Email
     @NotNull
     @Column(unique = true, nullable = false)
     private String email;
+
     @NonNull
     @Password
     @Column(name = "password", nullable = false)
@@ -47,24 +51,20 @@ public class User implements UserDetails {
 
     @Column(name = "enabled")
     private boolean isEnabled;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Token> tokens = new ArrayList<>();
 
-    public User(String firstname,
-                String lastname,
-                String email, @NonNull
-                String password,
-                Role role) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        isEnabled = false;
-    }
+    //    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<CardAccount> cardAccounts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<CashAccount> cashAccounts = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

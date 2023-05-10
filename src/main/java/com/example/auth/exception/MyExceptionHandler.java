@@ -1,6 +1,7 @@
 package com.example.auth.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +22,7 @@ public class MyExceptionHandler {
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> profileUnauthorized(Exception exception, HttpServletRequest request) {
+    public ResponseEntity<?> userUnauthorized(Exception exception, HttpServletRequest request) {
         return new ResponseEntity<>(
                 new ErrorDetails(
                         new Date(),
@@ -31,7 +32,7 @@ public class MyExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateKey.class)
-    public ResponseEntity<?> profileAlreadyRegistered(Exception exception, HttpServletRequest request) {
+    public ResponseEntity<?> userAlreadyRegistered(Exception exception, HttpServletRequest request) {
         return new ResponseEntity<>(
                 new ErrorDetails(
                         new Date(),
@@ -40,12 +41,22 @@ public class MyExceptionHandler {
                 HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<?> validationFailed(Exception exception, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                new ErrorDetails(
+                        new Date(),
+                        exception.getMessage(),
+                        request.getRequestURI()),
+                HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandling(Exception exception, HttpServletRequest request) {
         return new ResponseEntity<>(
                 new ErrorDetails(
                         new Date(),
-                        exception.getMessage(),
+                        exception.getLocalizedMessage(),
                         request.getRequestURI()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
