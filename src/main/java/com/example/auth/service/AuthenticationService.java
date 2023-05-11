@@ -1,5 +1,6 @@
 package com.example.auth.service;
 
+import com.example.auth.data.dto.MailDetails;
 import com.example.auth.data.dto.RegisterDTO;
 import com.example.auth.data.entity.ConfirmationToken;
 import com.example.auth.data.entity.Token;
@@ -12,8 +13,10 @@ import com.example.auth.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserService userService;
@@ -35,23 +39,8 @@ public class AuthenticationService {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final ConfirmationTokenService confirmationTokenService;
+    private final ApplicationEventPublisher eventPublisher;
     Logger logger = LogManager.getLogger();
-
-    public AuthenticationService(UserService userService,
-                                 TokenRepository tokenRepository,
-                                 JwtService jwtService,
-                                 AuthenticationManager authenticationManager,
-                                 EmailService emailService,
-                                 ObjectMapper objectMapper, UserRepository userRepository, ConfirmationTokenService confirmationTokenService) {
-        this.userService = userService;
-        this.tokenRepository = tokenRepository;
-        this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
-        this.emailService = emailService;
-        this.objectMapper = objectMapper;
-        this.userRepository = userRepository;
-        this.confirmationTokenService = confirmationTokenService;
-    }
 
     @Transactional
     public void register(@Valid RegisterDTO registerDTO) throws Exception {
@@ -75,12 +64,12 @@ public class AuthenticationService {
                     .saveConfirmationToken(
                             confirmationToken);
 
-            String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + savedConfirmationToken.getToken();
-
-            emailService.sendEmail(
+            MailDetails mailDetails = new MailDetails(
                     savedUser.getEmail(),
-                    link,
-                    "Confirm your email");
+                    savedConfirmationToken.getToken(),
+                    "Confirm your email"
+            );
+            eventPublisher.publishEvent(mailDetails);
         } else if (userExists.get().isEnabled()) {
             throw new Exception("User with " + userExists.get().getEmail() + " is already exist");
         } else {
