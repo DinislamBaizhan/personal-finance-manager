@@ -52,4 +52,12 @@ public abstract class Account implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
     public User user;
+
+    public void addMoney(BigDecimal money) {
+        balance = balance.add(money);
+    }
+
+    public void subtractMoney(BigDecimal money) {
+        balance = balance.subtract(money);
+    }
 }

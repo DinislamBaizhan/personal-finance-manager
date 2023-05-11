@@ -39,4 +39,9 @@ public class CreditController {
     public List<Debt> getAllIsActiveFalse() {
         return creditService.getAllNotActive();
     }
+
+//    @PostMapping("/{creditId}/repay")
+//    public Debt repay(@RequestBody Expense expense, @PathVariable Long creditId) {
+//
+//    }
 }

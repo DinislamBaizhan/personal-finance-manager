@@ -47,14 +47,4 @@ public class CardAccount extends Account {
     @NotNull
     @Enumerated(EnumType.STRING)
     private CardType cardType;
-
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "income_id")
-//    private List<Income> incomeList = new ArrayList<>();
-//
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "expense_id")
-//    private List<Expense> expenseList = new ArrayList<>();
 }
