@@ -67,19 +67,7 @@ public class CardAccountService {
         eventPublisher.publishEvent(income);
         return cardAccountRepository.save(cardAccount);
     }
-
-    //    @Transactional
-//    public CardAccount subtractMoney(Expense expense, Long categoryId) {
-//        Category category = categoryRepository.findById(categoryId)
-//                .orElseThrow(() -> new EntityNotFoundException("category not found"));
-//        CardAccount cardAccount = getById(expense.getCardId());
-//        cardAccount.subtractMoney(expense.getAmount());
-//        expense.setUser(cardAccount.getUser());
-//        expense.setCategory(category);
-//        expenseRepository.save(expense);
-////        eventPublisher.publishEvent(expense);
-//        return cardAccountRepository.save(cardAccount);
-//    }
+    
     @Transactional
     public CardAccount subtractMoney(Expense expense, Long categoryId) {
         CardAccount cardAccount = getById(expense.getCardId());

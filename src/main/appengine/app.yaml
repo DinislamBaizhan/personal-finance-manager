@@ -1,0 +1,13 @@
+runtime: "java11"
+
+handlers:
+  - url: "/.*"
+    script: "this field is required, but ignored"
+
+instance_class: F4
+
+health_check:
+  enable_health_check: false
+
+env_variables:
+  ENCRYPT_KEY: "your_encryption_key_here"
