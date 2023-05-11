@@ -3,7 +3,6 @@ package com.example.auth.data.entity;
 import com.example.auth.data.base.Account;
 import com.example.auth.data.enums.CardType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,8 +13,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -51,13 +48,13 @@ public class CardAccount extends Account {
     @Enumerated(EnumType.STRING)
     private CardType cardType;
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "income_id")
-    private List<Income> incomeList = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "expense_id")
-    private List<Expense> expenseList = new ArrayList<>();
+//    @JsonIgnore
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "income_id")
+//    private List<Income> incomeList = new ArrayList<>();
+//
+//    @JsonIgnore
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "expense_id")
+//    private List<Expense> expenseList = new ArrayList<>();
 }

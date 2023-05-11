@@ -55,6 +55,8 @@ public class CreditController {
     public Debt getAllIsActive(@RequestBody Debt debt) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(authentication.getName()).get();
+        debt.setDebtType(DebtType.CREDIT);
+        debt.setUser(user);
 
         return debtRepository.save(debt);
     }
