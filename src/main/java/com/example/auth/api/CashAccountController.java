@@ -1,12 +1,8 @@
 package com.example.auth.api;
 
 import com.example.auth.data.entity.CashAccount;
-import com.example.auth.data.entity.User;
-import com.example.auth.repository.CashAccountRepository;
-import com.example.auth.repository.UserRepository;
+import com.example.auth.service.CashAccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,34 +12,20 @@ import java.util.List;
 @RequestMapping("/api/vi/cash-account")
 public class CashAccountController {
 
-    private final CashAccountRepository cashAccountRepository;
-    private final UserRepository userRepository;
+    private final CashAccountService cashAccountService;
 
-    @GetMapping("/{accountId}")
-    private CashAccount get(@PathVariable Long accountId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(authentication.getName()).get();
-
-        return cashAccountRepository.findByIdAndUserId(accountId, user.getId()).get();
-
+    @PostMapping
+    public CashAccount post(@RequestBody CashAccount cashAccount) {
+        return cashAccountService.save(cashAccount);
     }
 
     @GetMapping
-    private List<CashAccount> getAll() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(authentication.getName()).get();
-
-        return cashAccountRepository.findAllByUserId(user.getId());
-
+    public List<CashAccount> getAll() {
+        return cashAccountService.getAll();
     }
 
-    @PostMapping
-    private CashAccount post(@RequestBody CashAccount cashAccount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(authentication.getName()).get();
-
-        cashAccount.setUser(user);
-        return cashAccountRepository.save(cashAccount);
-
+    @GetMapping("/{accountId}")
+    public CashAccount getById(@PathVariable Long accountId) {
+        return cashAccountService.getById(accountId);
     }
 }
