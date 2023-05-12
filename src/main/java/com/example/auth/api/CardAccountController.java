@@ -1,13 +1,13 @@
 package com.example.auth.api;
 
 import com.example.auth.data.entity.CardAccount;
-import com.example.auth.data.entity.User;
-import com.example.auth.repository.CardAccountRepository;
-import com.example.auth.repository.UserRepository;
+import com.example.auth.data.entity.Expense;
+import com.example.auth.data.entity.Income;
+import com.example.auth.service.CardAccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -15,23 +15,36 @@ import java.util.List;
 @RequestMapping("/api/v1/card-account")
 public class CardAccountController {
 
-    private final CardAccountRepository cardAccountRepository;
-    private final UserRepository userRepository;
-
-    @GetMapping
-    public List<CardAccount> get() {
-        var ss = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(ss.getName()).get();
-
-        return cardAccountRepository.findByUserId(user.getId());
-    }
+    private final CardAccountService cardAccountService;
 
     @PostMapping
     public CardAccount post(@RequestBody CardAccount cardAccount) {
-        var ss = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(ss.getName()).get();
-        cardAccount.setUser(user);
+        return cardAccountService.save(cardAccount);
+    }
 
-        return cardAccountRepository.save(cardAccount);
+    @GetMapping
+    public List<CardAccount> getAll() {
+        return cardAccountService.getAll();
+    }
+
+    @GetMapping("/{cardId}")
+    public CardAccount getById(@PathVariable Long cardId) {
+        return cardAccountService.getById(cardId);
+    }
+
+    @PatchMapping("/update/{cardId}/balance")
+    public CardAccount updateBalance(@PathVariable Long cardId,
+                                     @RequestParam("balance") BigDecimal balance) {
+        return cardAccountService.switchBalance(cardId, balance);
+    }
+
+    @PatchMapping("/add/balance")
+    public CardAccount addMoney(@RequestBody Income income, @RequestParam Long categoryId) {
+        return cardAccountService.addMoney(income, categoryId);
+    }
+
+    @PatchMapping("/subtract/balance")
+    public CardAccount getById(@RequestBody Expense expense, @RequestParam Long categoryId) throws Exception {
+        return cardAccountService.subtractMoney(expense, categoryId);
     }
 }

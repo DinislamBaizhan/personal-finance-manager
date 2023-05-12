@@ -58,4 +58,12 @@ public class Debt {
             active = false;
         }
     }
+
+    public void addMoney(BigDecimal money) {
+        indebtedness = indebtedness.add(money);
+    }
+
+    public void subtractMoney(BigDecimal money) {
+        indebtedness = indebtedness.subtract(money);
+    }
 }

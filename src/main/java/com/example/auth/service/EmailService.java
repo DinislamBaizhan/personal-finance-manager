@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class EmailService {
             helper.setText(content, true);
             javaMailSender.send(message);
             logger.info("send message to + %s", email);
-        } catch (MessagingException | jakarta.mail.MessagingException e) {
+        } catch (jakarta.mail.MessagingException e) {
             logger.error(MessageFormat.format("Failed to send email for: {0} {1}", email, e));
             throw new IllegalArgumentException("Failed to send email for: " + email);
         }

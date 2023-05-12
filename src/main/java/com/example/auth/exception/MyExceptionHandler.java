@@ -21,6 +21,16 @@ public class MyExceptionHandler {
                 HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<?> notMoney(Exception exception, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                new ErrorDetails(
+                        new Date(),
+                        exception.getMessage(),
+                        request.getRequestURI()),
+                HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> userUnauthorized(Exception exception, HttpServletRequest request) {
         return new ResponseEntity<>(

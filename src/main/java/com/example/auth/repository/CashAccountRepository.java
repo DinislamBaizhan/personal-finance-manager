@@ -12,5 +12,5 @@ public interface CashAccountRepository extends JpaRepository<CashAccount, Long> 
 
     Optional<CashAccount> findByIdAndUserId(Long accountId, Long userId);
 
-    List<CashAccount> findAllByUserId(Long userId);
+    Optional<List<CashAccount>> findAllByUserId(Long userId);
 }
