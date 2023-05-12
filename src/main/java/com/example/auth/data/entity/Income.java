@@ -1,6 +1,5 @@
 package com.example.auth.data.entity;
 
-import com.example.auth.data.base.Transaction;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

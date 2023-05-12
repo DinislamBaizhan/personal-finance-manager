@@ -44,7 +44,7 @@ public class CardAccountController {
     }
 
     @PatchMapping("/subtract/balance")
-    public CardAccount getById(@RequestBody Expense expense, @RequestParam Long categoryId) throws Exception {
+    public CardAccount getById(@RequestBody Expense expense, @RequestParam Long categoryId) {
         return cardAccountService.subtractMoney(expense, categoryId);
     }
 }

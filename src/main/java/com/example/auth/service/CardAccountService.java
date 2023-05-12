@@ -3,7 +3,9 @@ package com.example.auth.service;
 import com.example.auth.data.entity.*;
 import com.example.auth.exception.DataNotFound;
 import com.example.auth.exception.InsufficientFundsException;
-import com.example.auth.repository.*;
+import com.example.auth.repository.CardAccountRepository;
+import com.example.auth.repository.CategoryRepository;
+import com.example.auth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,6 @@ public class CardAccountService {
     private final CardAccountRepository cardAccountRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CategoryRepository categoryRepository;
-    private final IncomeRepository incomeRepository;
-    private final ExpenseRepository expenseRepository;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,9 +51,13 @@ public class CardAccountService {
     }
 
     public CardAccount switchBalance(Long carId, BigDecimal balance) {
-        CardAccount cardAccount = getById(carId);
-        cardAccount.setBalance(balance);
-        return cardAccountRepository.save(cardAccount);
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("balance cannot be less than zero");
+        } else {
+            CardAccount cardAccount = getById(carId);
+            cardAccount.setBalance(balance);
+            return cardAccountRepository.save(cardAccount);
+        }
     }
 
     @Transactional
@@ -64,10 +68,12 @@ public class CardAccountService {
         cardAccount.addMoney(income.getAmount());
         income.setUser(cardAccount.getUser());
         income.setCategory(category);
+
+        CardAccount newAccount = cardAccountRepository.save(cardAccount);
         eventPublisher.publishEvent(income);
-        return cardAccountRepository.save(cardAccount);
+        return newAccount;
     }
-    
+
     @Transactional
     public CardAccount subtractMoney(Expense expense, Long categoryId) {
         CardAccount cardAccount = getById(expense.getCardId());
@@ -82,8 +88,8 @@ public class CardAccountService {
         expense.setUser(cardAccount.getUser());
         expense.setCategory(category);
 
-        expenseRepository.save(expense);
-        cardAccountRepository.save(cardAccount);
-        return cardAccount;
+        CardAccount newAccount = cardAccountRepository.save(cardAccount);
+        eventPublisher.publishEvent(expense);
+        return newAccount;
     }
 }
