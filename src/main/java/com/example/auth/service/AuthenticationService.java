@@ -64,10 +64,11 @@ public class AuthenticationService {
                     .saveConfirmationToken(
                             confirmationToken);
 
+            String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + confirmationToken.getToken();
             MailDetails mailDetails = new MailDetails(
                     savedUser.getEmail(),
                     savedConfirmationToken.getToken(),
-                    "Confirm your email"
+                    buildEmail(savedUser.getFirstname(), link, confirmationToken.getExpiresAt())
             );
             eventPublisher.publishEvent(mailDetails);
         } else if (userExists.get().isEnabled()) {
@@ -167,7 +168,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public String confirmToken(String token) {
+    public void confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
                 .orElseThrow(() ->
@@ -190,8 +191,28 @@ public class AuthenticationService {
                         + confirmationToken.getToken()));
         user.setEnabled(true);
         userRepository.save(user);
+    }
 
-        return "confirmed";
+    private String buildEmail(String name, String link, LocalDateTime expiresAt) {
+        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+                "<h1>Dear " + name + ",</h1>\n" +
+                "<p>Congratulations! You have successfully registered on [Website Name]. We're thrilled to have you join our community. Before you get started, we kindly ask you to confirm your email address to ensure the security and reliability of your account.</p>\n" +
+                "<p>To confirm your email address and activate your account, please follow the steps below:</p>\n" +
+                "<ol>\n" +
+                "<li>Click on the following link or copy and paste it into your web browser:<br>\n" +
+                "<a href=\"" + link + "\">" + link + "</a></li>\n" +
+                "<li>You will be redirected to a confirmation page on our website.</li>\n" +
+                "<li>Once you land on the confirmation page, your email address will be verified, and your account will be activated.</li>\n" +
+                "</ol>\n" +
+                "<p>Please note that the confirmation link will expire in " +  expiresAt + ". If you do not confirm your email address within this time frame, you may need to register again.</p>\n" +
+                "<p>If you did not register on [Website Name] or believe this email was sent to you by mistake, please disregard it, and no further action is required.</p>\n" +
+                "<p>If you encounter any issues during the registration process or have any questions, please feel free to reach out to our support team at [Support Email Address]. We're here to assist you.</p>\n" +
+                "<p>Thank you for choosing [Website Name]. We look forward to providing you with an amazing experience!</p>\n" +
+                "<p>Best regards,</p>\n" +
+                "<p>[Your Name]<br>\n" +
+                "[Your Position/Role]<br>\n" +
+                "[Website Name]</p>\n" +
+                "</div></div>";
     }
 }
 

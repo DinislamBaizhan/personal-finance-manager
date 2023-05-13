@@ -54,13 +54,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    @PostMapping("/verify-email")
+    @GetMapping("/verify-email")
     @Operation(summary = "Verify user e-mail")
     @ApiResponse(responseCode = "200", description = "Email verified successfully", content = @Content(mediaType = "application/json", schema = @Schema(type = "string")))
     @ApiResponse(responseCode = "400", description = "Invalid token", content = @Content(mediaType = "application/json", schema = @Schema(type = "string")))
-    public String verifyEmail(@Parameter(description = "The verification token.",
+    public ResponseEntity<String> verifyEmail(@Parameter(description = "The verification token.",
             required = true) @RequestParam("token") String token) {
-        return service.confirmToken(token);
+        service.confirmToken(token);
+        return ResponseEntity.ok("Email verified successfully");
     }
 
     @PostMapping("/again")
