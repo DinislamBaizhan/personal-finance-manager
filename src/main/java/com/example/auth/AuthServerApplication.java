@@ -12,9 +12,9 @@ public class AuthServerApplication {
 
     // The `GetMapping` annotation indicates that this method should be called
     // when handling GET requests to the "/simple-request" endpoint
-    @GetMapping("/simple-request")
+    @GetMapping("/test")
     public String simpleRequest() {
-        System.out.println("simpleRequest was called");
+        System.out.println("Test was called");
         // In this case, we return the plain text response "ok"
         return "ok";
     }
