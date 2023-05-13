@@ -19,10 +19,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -43,7 +45,7 @@ public class AuthenticationService {
     Logger logger = LogManager.getLogger();
 
     @Transactional
-    public void register(@Valid RegisterDTO registerDTO) throws Exception {
+    public void register(@Valid RegisterDTO registerDTO) {
         var userExists = userRepository
                 .findByEmail(registerDTO.getEmail());
 
@@ -72,7 +74,7 @@ public class AuthenticationService {
             );
             eventPublisher.publishEvent(mailDetails);
         } else if (userExists.get().isEnabled()) {
-            throw new Exception("User with " + userExists.get().getEmail() + " is already exist");
+            throw new UsernameNotFoundException("User with " + userExists.get().getEmail() + " is already exist");
         } else {
             throw new UsernameNotFoundException("verify your jwt token");
         }
@@ -109,7 +111,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
         User profile = userService.findByEmail(request.getEmail());
         if (profile.isEnabled()) {
@@ -128,11 +130,10 @@ public class AuthenticationService {
                     jwtToken
             );
         } else {
-            throw new Exception("Verify email");
+            throw new BadCredentialsException("verify email");
         }
     }
 
-    //    @Transactional
     public void saveUserToken(User profile, String jwtToken) {
         var token = new Token(
                 jwtToken,
@@ -145,7 +146,7 @@ public class AuthenticationService {
             logger.info("Token saved for user with id {}", profile.getId());
         } catch (DataAccessException ex) {
             logger.error("Failed to save token for user with id {}", profile.getId(), ex);
-            throw new RuntimeException("Failed to save token for user with id " + profile.getId(), ex);
+            throw new ServerErrorException("Failed to save token for user with id " + profile.getId(), ex);
         }
     }
 
@@ -163,7 +164,7 @@ public class AuthenticationService {
             tokenRepository.saveAll(validUserTokens);
         } catch (Exception e) {
             logger.error("Failed to save all tokens\", e.getCause()");
-            throw new RuntimeException("Failed to save all tokens", e.getCause());
+            throw new ServerErrorException("Failed to save all tokens", e.getCause());
         }
     }
 
@@ -204,7 +205,7 @@ public class AuthenticationService {
                 "<li>You will be redirected to a confirmation page on our website.</li>\n" +
                 "<li>Once you land on the confirmation page, your email address will be verified, and your account will be activated.</li>\n" +
                 "</ol>\n" +
-                "<p>Please note that the confirmation link will expire in " +  expiresAt + ". If you do not confirm your email address within this time frame, you may need to register again.</p>\n" +
+                "<p>Please note that the confirmation link will expire in " + expiresAt + ". If you do not confirm your email address within this time frame, you may need to register again.</p>\n" +
                 "<p>If you did not register on [Website Name] or believe this email was sent to you by mistake, please disregard it, and no further action is required.</p>\n" +
                 "<p>If you encounter any issues during the registration process or have any questions, please feel free to reach out to our support team at [Support Email Address]. We're here to assist you.</p>\n" +
                 "<p>Thank you for choosing [Website Name]. We look forward to providing you with an amazing experience!</p>\n" +
