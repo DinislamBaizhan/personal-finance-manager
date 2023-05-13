@@ -1,7 +1,5 @@
-package com.example.auth.data.base;
+package com.example.auth.data.entity;
 
-import com.example.auth.data.entity.Category;
-import com.example.auth.data.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,7 +19,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class Transaction implements Serializable {
+public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
