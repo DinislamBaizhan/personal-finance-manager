@@ -11,7 +11,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 public class NewUserNotifier {
-    private static final String VERIFY_MAIL_URI = "http://localhost:8080/api/v1/auth/verify-email?token=";
+    //private static final String VERIFY_MAIL_URI = "http://localhost:8080/api/v1/auth/verify-email?token=";
     private final EmailService emailService;
 
     @Async
@@ -19,7 +19,7 @@ public class NewUserNotifier {
     public void onUserCreate(MailDetails mailDetails) {
         emailService.sendEmail(
                 mailDetails.getEmail(),
-                VERIFY_MAIL_URI + mailDetails.getConfirmToken(),
+                "Confirm email",
                 mailDetails.getMessage()
         );
     }
