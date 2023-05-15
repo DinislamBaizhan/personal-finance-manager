@@ -1,10 +1,12 @@
 package com.example.auth.repository;
 
 import com.example.auth.data.entity.ConfirmationToken;
+import com.example.auth.data.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -17,11 +19,13 @@ public interface ConfirmationTokenRepository
 
     Optional<ConfirmationToken> findByToken(String token);
 
+    Optional<ConfirmationToken> findByConfirmedIsFalseAndUserAndExpiresAtAfter(User user, LocalDateTime localDateTime);
+
     @Transactional
     @Modifying
     @Query("UPDATE ConfirmationToken c " +
-            "SET c.confirmedAt = ?2 " +
-            "WHERE c.token = ?1")
-    int updateConfirmedAt(String token,
-                          LocalDateTime confirmedAt);
+            "SET c.confirmedAt = :confirmedAt, c.confirmed = true " +
+            "WHERE c.token = :token")
+    void updateConfirmedAt(@Param("token") String token,
+                           @Param("confirmedAt") LocalDateTime confirmedAt);
 }

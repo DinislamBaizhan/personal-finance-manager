@@ -1,13 +1,9 @@
 package com.example.auth.api;
 
 import com.example.auth.data.dto.RegisterDTO;
-import com.example.auth.data.entity.User;
 import com.example.auth.data.request.AuthenticationRequest;
 import com.example.auth.data.response.AuthenticationResponse;
 import com.example.auth.service.AuthenticationService;
-import com.example.auth.service.DecodedToken;
-import com.example.auth.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,22 +11,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 @Tag(name = "authentication controller", description = "Authentication management")
 public class AuthenticationController {
     private final AuthenticationService service;
-    private final UserService userService;
-
-    public AuthenticationController(AuthenticationService service,
-                                    UserService userService) {
-        this.service = service;
-        this.userService = userService;
-    }
 
     @SneakyThrows
     @PostMapping("/register")
@@ -50,7 +41,7 @@ public class AuthenticationController {
     @ApiResponse(responseCode = "401", description = "User authentication failed", content = @Content(mediaType = "application/json", schema = @Schema(type = "string")))
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    ) throws Exception {
+    ) {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
@@ -67,16 +58,10 @@ public class AuthenticationController {
     @PostMapping("/again")
     @Operation(summary = "Request verification e-mail one more time")
     @ApiResponse(responseCode = "200", description = "The request was successful.")
-    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) throws Exception {
+    public ResponseEntity<String> sendAgain(@RequestParam("email") String email) throws Exception {
 
-        User profile = userService.findByEmail(registerDTO.getEmail());
-
-        RegisterDTO register = new RegisterDTO(
-                profile.getFirstname(),
-                profile.getLastname(),
-                profile.getEmail(),
-                profile.getPassword()
-        );
+        RegisterDTO register = new RegisterDTO();
+        register.setEmail(email);
 
         service.register(register);
         return ResponseEntity.ok("Email sent to confirm profile again");
@@ -86,24 +71,19 @@ public class AuthenticationController {
     @Operation(summary = "Request for password reset e-mail")
     @ApiResponse(responseCode = "200", description = "The request was successful.")
     public ResponseEntity<String> passwordReset(@Parameter(description = "The user's email address.",
-            required = true) @RequestBody String email) throws JsonProcessingException {
+            required = true) @RequestParam("email") String email) {
         service.resetPassword(email);
         return ResponseEntity.ok("check your email to reset your password");
     }
 
     @PatchMapping("/reset-password")
     @Operation(summary = "Update user profile with a new password")
-    public ResponseEntity<String> passwordReset(@Parameter(description = "Authentication token" ,required = true)
-            @RequestParam("token") String token,
-            @RequestBody String password
+    public ResponseEntity<String> passwordReset(@Parameter(description = "Authentication token", required = true)
+                                                @RequestParam("token") String token,
+                                                @RequestParam("password") String password
     ) throws Exception {
 
-        DecodedToken decodedToken = DecodedToken.getDecoded(token);
-        String email = decodedToken.sub;
-        User profile = userService.findByEmail(email);
-
-        service.updatePassword(profile, password);
-
+        service.updatePassword(password, token);
         return ResponseEntity.ok("your password has been successfully updated");
     }
 }

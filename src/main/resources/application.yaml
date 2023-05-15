@@ -1,0 +1,32 @@
+server:
+  error:
+    include-exception: true
+    include-message: always
+    include-stacktrace: always
+spring:
+  datasource:
+    password: admin
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/fin_db
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  mail:
+    host: smtp.gmail.com
+    password: fbkxdefanqpycbev
+    port: 587
+    username: aspanadam@gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true

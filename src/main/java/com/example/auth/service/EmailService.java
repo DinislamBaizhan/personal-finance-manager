@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 
@@ -20,11 +21,12 @@ public class EmailService {
     }
 
     @Async
+    @Transactional
     public void sendEmail(String email, String subject, String content) {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
         try {
-            helper.setFrom("com.example.habit_tracker");
+            helper.setFrom("personal_finance@hackaton.com");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);

@@ -10,7 +10,6 @@ import com.example.auth.data.request.AuthenticationRequest;
 import com.example.auth.data.response.AuthenticationResponse;
 import com.example.auth.repository.TokenRepository;
 import com.example.auth.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerErrorException;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,68 +44,63 @@ public class AuthenticationService {
     Logger logger = LogManager.getLogger();
 
     @Transactional
-    public void register(@Valid RegisterDTO registerDTO) {
+    public void register(@Valid RegisterDTO registerDTO) throws Exception {
         var userExists = userRepository
                 .findByEmail(registerDTO.getEmail());
 
         if (userExists.isEmpty()) {
 
             User savedUser = userService.saveNewUser(registerDTO);
-
-            String token = UUID.randomUUID().toString();
-
-            ConfirmationToken confirmationToken = new ConfirmationToken(
-                    token,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusMinutes(15),
-                    savedUser
-            );
-
-            ConfirmationToken savedConfirmationToken = confirmationTokenService
-                    .saveConfirmationToken(
-                            confirmationToken);
-
-            String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + confirmationToken.getToken();
-            MailDetails mailDetails = new MailDetails(
-                    savedUser.getEmail(),
-                    savedConfirmationToken.getToken(),
-                    buildEmail(savedUser.getFirstname(), link, confirmationToken.getExpiresAt())
-            );
-            eventPublisher.publishEvent(mailDetails);
+            messageForNewUser(savedUser);
         } else if (userExists.get().isEnabled()) {
-            throw new UsernameNotFoundException("User with " + userExists.get().getEmail() + " is already exist");
+            throw new DuplicateKeyException("User with " + userExists.get().getEmail() + " is already exist");
         } else {
-            throw new UsernameNotFoundException("verify your jwt token");
+            messageForNewUser(userExists.get());
         }
-
     }
 
     @Transactional
-    public void resetPassword(String email) throws JsonProcessingException {
+    public void messageForNewUser(User user) throws Exception {
+        ConfirmationToken confirmationToken = confirmationTokenService
+                .saveConfirmationToken(user);
 
-        AuthenticationRequest mappedEmail = objectMapper.readValue(email, AuthenticationRequest.class);
+        String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + confirmationToken.getToken();
+        MailDetails mailDetails = new MailDetails(
+                user.getEmail(),
+                confirmationToken.getToken(),
+                buildEmail(user.getFirstname(), link, confirmationToken.getExpiresAt())
+        );
+        eventPublisher.publishEvent(mailDetails);
+    }
 
+    @Transactional
+    public void resetPassword(String email) {
         int tokenExpiredDate = 1000 * 60 * 30;
-        User profile = userService.findByEmail(mappedEmail.getEmail());
+        User user = userService.findByEmail(email);
 
-        String jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
-        revokeAllUserTokens(profile);
-        saveUserToken(profile, jwtToken);
+        String jwtToken = jwtService.generateToken(user, tokenExpiredDate);
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
 
         String link = "http://localhost:8080/api/v1/auth/reset-password?token=" + jwtToken;
-        emailService.sendEmail(profile.getEmail(), "Password Reset",
-                "Click on this link to reset your password: " + link);
+        MailDetails mailDetails = new MailDetails(
+                email,
+                jwtToken,
+                buildEmail(user.getFirstname(), link, LocalDateTime.now().plusMinutes(30))
+        );
+        eventPublisher.publishEvent(mailDetails);
     }
 
     @Transactional
-    public void updatePassword(User profile, String password) throws Exception {
-
-        AuthenticationRequest mappedPassword = objectMapper.readValue(password, AuthenticationRequest.class);
+    public void updatePassword(String password, String token) throws Exception {
+        DecodedToken decodedToken = DecodedToken.getDecoded(token);
+        String email = decodedToken.sub;
+        User user = userService.findByEmail(email);
 
         int tokenExpiredDate = 1000 * 60 * 60 * 24;
-        User updatedProfile = userService.updPassword(profile, mappedPassword.getPassword());
+        User updatedProfile = userService.updPassword(user, password);
         String jwtToken = jwtService.generateToken(updatedProfile, tokenExpiredDate);
-        revokeAllUserTokens(profile);
+        revokeAllUserTokens(user);
         saveUserToken(updatedProfile, jwtToken);
     }
 
@@ -206,6 +200,27 @@ public class AuthenticationService {
                 "<li>Once you land on the confirmation page, your email address will be verified, and your account will be activated.</li>\n" +
                 "</ol>\n" +
                 "<p>Please note that the confirmation link will expire in " + expiresAt + ". If you do not confirm your email address within this time frame, you may need to register again.</p>\n" +
+                "<p>If you did not register on [Website Name] or believe this email was sent to you by mistake, please disregard it, and no further action is required.</p>\n" +
+                "<p>If you encounter any issues during the registration process or have any questions, please feel free to reach out to our support team at [Support Email Address]. We're here to assist you.</p>\n" +
+                "<p>Thank you for choosing [Website Name]. We look forward to providing you with an amazing experience!</p>\n" +
+                "<p>Best regards,</p>\n" +
+                "<p>[Your Name]<br>\n" +
+                "[Your Position/Role]<br>\n" +
+                "[Website Name]</p>\n" +
+                "</div></div>";
+    }
+
+    private String emailToResetPass(String name, String link, LocalDateTime expiresAt) {
+        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+                "<h1>Dear " + name + ",</h1>\n" +
+                "<p>To confirm your email address and activate your account, please follow the steps below:</p>\n" +
+                "<ol>\n" +
+                "<li>Click on the following link or copy and paste it into your web browser:<br>\n" +
+                "<a href=\"" + link + "\">" + link + "</a></li>\n" +
+                "<li>You will be redirected to a confirmation page on our website.</li>\n" +
+                "<li>As soon as you go to the page, you will be prompted to enter a new email password.</li>\n" +
+                "</ol>\n" +
+                "<p>PPlease note that the password reset link will expire at " + expiresAt + " If you do not verify your email address within this time period, you may need to re-register..</p>\n" +
                 "<p>If you did not register on [Website Name] or believe this email was sent to you by mistake, please disregard it, and no further action is required.</p>\n" +
                 "<p>If you encounter any issues during the registration process or have any questions, please feel free to reach out to our support team at [Support Email Address]. We're here to assist you.</p>\n" +
                 "<p>Thank you for choosing [Website Name]. We look forward to providing you with an amazing experience!</p>\n" +

@@ -11,7 +11,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 public class NewUserNotifier {
-    //private static final String VERIFY_MAIL_URI = "http://localhost:8080/api/v1/auth/verify-email?token=";
     private final EmailService emailService;
 
     @Async

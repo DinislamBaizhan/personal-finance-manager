@@ -9,6 +9,4 @@ public class MailDetails {
     private String email;
     private String confirmToken;
     private String message;
-
-
 }
