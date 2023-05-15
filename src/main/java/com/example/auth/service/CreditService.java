@@ -23,6 +23,8 @@ public class CreditService {
     private final DebtRepository debtRepository;
     private final IncomeRepository incomeRepository;
     private final ExpenseRepository expenseRepository;
+    private final CardAccountService cardAccountService;
+    private final CashAccountService cashAccountService;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,6 +66,8 @@ public class CreditService {
 //        User user = getCurrentUser();
 //        Debt credit = getById(creditId);
 //        credit.subtractMoney(expense.getAmount());
+//
+//
 //    }
 
 }

@@ -3,6 +3,7 @@ package com.example.auth.service;
 import com.example.auth.data.entity.*;
 import com.example.auth.exception.DataNotFound;
 import com.example.auth.exception.InsufficientFundsException;
+import com.example.auth.repository.AccountRepository;
 import com.example.auth.repository.CardAccountRepository;
 import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
@@ -25,6 +26,7 @@ public class CardAccountService {
     private final CardAccountRepository cardAccountRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CategoryRepository categoryRepository;
+    private final AccountRepository accountRepository;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -34,6 +36,7 @@ public class CardAccountService {
 
     public CardAccount save(CardAccount cardAccount) {
         User user = getCurrentUser();
+//        List<Account> accounts = accountRepository.findAllByUserAndNameEquals(user, cardAccount.getName());
         cardAccount.setUser(user);
         return cardAccountRepository.save(cardAccount);
     }

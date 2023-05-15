@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +25,11 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     @SneakyThrows
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Register new user")
     @ApiResponse(responseCode = "200", description = "A message was sent to the email to verify the account", content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
     public ResponseEntity<String> register(
-            @RequestBody @Valid RegisterDTO request
+            @ModelAttribute @Valid RegisterDTO request
     ) {
         service.register(request);
         return ResponseEntity.ok("a message was sent to the email: "

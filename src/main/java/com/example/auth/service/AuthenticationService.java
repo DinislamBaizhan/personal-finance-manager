@@ -49,7 +49,6 @@ public class AuthenticationService {
                 .findByEmail(registerDTO.getEmail());
 
         if (userExists.isEmpty()) {
-
             User savedUser = userService.saveNewUser(registerDTO);
             messageForNewUser(savedUser);
         } else if (userExists.get().isEnabled()) {

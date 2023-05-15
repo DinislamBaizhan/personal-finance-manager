@@ -4,13 +4,20 @@ server:
     include-message: always
     include-stacktrace: always
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 100MB
+      max-request-size: 120MB
+
   datasource:
     password: admin
     username: postgres
     url: jdbc:postgresql://localhost:5432/fin_db
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     open-in-view: false
     properties:
       hibernate:
