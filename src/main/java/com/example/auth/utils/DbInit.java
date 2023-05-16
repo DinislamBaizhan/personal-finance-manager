@@ -13,8 +13,9 @@ public class DbInit {
 
     @PostConstruct
     public void postConstruct() {
-        for (int i = 0; i < 10; i++) {
+        for (long i = 0; i < 10; i++) {
             Category category = new Category();
+            category.setId(i);
             category.setColor("Sas " + i);
             category.setIcon("asdasd" + i);
             categoryRepository.save(category);

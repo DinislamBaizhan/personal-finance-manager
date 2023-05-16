@@ -1,9 +1,9 @@
 package com.example.auth.service;
 
 import com.example.auth.data.entity.*;
+import com.example.auth.data.enums.AccountType;
 import com.example.auth.exception.DataNotFound;
 import com.example.auth.exception.InsufficientFundsException;
-import com.example.auth.repository.AccountRepository;
 import com.example.auth.repository.CardAccountRepository;
 import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
@@ -26,7 +26,6 @@ public class CardAccountService {
     private final CardAccountRepository cardAccountRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CategoryRepository categoryRepository;
-    private final AccountRepository accountRepository;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,28 +35,28 @@ public class CardAccountService {
 
     public CardAccount save(CardAccount cardAccount) {
         User user = getCurrentUser();
-//        List<Account> accounts = accountRepository.findAllByUserAndNameEquals(user, cardAccount.getName());
+        cardAccount.setAccountType(AccountType.CARD);
         cardAccount.setUser(user);
         return cardAccountRepository.save(cardAccount);
     }
 
     public List<CardAccount> getAll() {
         User user = getCurrentUser();
-        return cardAccountRepository.findByUserId(user.getId())
+        return cardAccountRepository.findAllByUserId(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Card accounts not found"));
     }
 
-    public CardAccount getById(Long cardId) {
+    public CardAccount getById(Long accountId) {
         User user = getCurrentUser();
-        return cardAccountRepository.findByIdAndUserId(cardId, user.getId())
+        return cardAccountRepository.findByIdAndUserId(accountId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Card account not found"));
     }
 
-    public CardAccount switchBalance(Long carId, BigDecimal balance) {
+    public CardAccount switchBalance(Long accountId, BigDecimal balance) {
         if (balance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("balance cannot be less than zero");
         } else {
-            CardAccount cardAccount = getById(carId);
+            CardAccount cardAccount = getById(accountId);
             cardAccount.setBalance(balance);
             return cardAccountRepository.save(cardAccount);
         }
@@ -67,32 +66,38 @@ public class CardAccountService {
     public CardAccount addMoney(Income income, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("category not found"));
-        CardAccount cardAccount = getById(income.getCardId());
+        CardAccount cardAccount = getById(income.getAccountId());
         cardAccount.addMoney(income.getAmount());
         income.setUser(cardAccount.getUser());
         income.setCategory(category);
+        income.setAccountName(cardAccount.getName());
+        income.setAccountType(AccountType.CARD);
 
-        CardAccount newAccount = cardAccountRepository.save(cardAccount);
         eventPublisher.publishEvent(income);
-        return newAccount;
+        return cardAccountRepository.save(cardAccount);
     }
 
     @Transactional
     public CardAccount subtractMoney(Expense expense, Long categoryId) {
-        CardAccount cardAccount = getById(expense.getCardId());
+        CardAccount cardAccount = getById(expense.getAccountId());
+        BigDecimal balance = cardAccount.getBalance();
+        BigDecimal amount = expense.getAmount();
 
-        if (cardAccount.getBalance().compareTo(expense.getAmount()) < 0) {
+        if (balance.compareTo(amount) < 0) {
             throw new InsufficientFundsException("not money");
+        } else {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new DataNotFound("category not found"));
+
+            cardAccount.subtractMoney(expense.getAmount());
+            expense.setUser(cardAccount.getUser());
+            expense.setCategory(category);
+            expense.setAccountName(cardAccount.getName());
+            expense.setAccountType(AccountType.CASH);
+
+            CardAccount newAccount = cardAccountRepository.save(cardAccount);
+            eventPublisher.publishEvent(expense);
+            return newAccount;
         }
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new DataNotFound("category not found"));
-
-        cardAccount.subtractMoney(expense.getAmount());
-        expense.setUser(cardAccount.getUser());
-        expense.setCategory(category);
-
-        CardAccount newAccount = cardAccountRepository.save(cardAccount);
-        eventPublisher.publishEvent(expense);
-        return newAccount;
     }
 }

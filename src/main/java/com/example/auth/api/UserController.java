@@ -36,21 +36,6 @@ public class UserController {
         return userService.getDTO();
     }
 
-//    @GetMapping("1")
-//    @Operation(summary = "Get user entity")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Successfully retrieved user entity"),
-//            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-//            @ApiResponse(responseCode = "403", description = "Forbidden"),
-//            @ApiResponse(responseCode = "404", description = "User not found"),
-//            @ApiResponse(responseCode = "500", description = "Internal server error")
-//    })
-//    public User getUser() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        return userRepository.findByEmail(authentication.getName())
-//                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
-//    }
-
     @PatchMapping("/name")
     @Operation(summary = "Update user name")
     @ApiResponses(value = {

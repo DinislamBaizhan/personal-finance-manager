@@ -20,12 +20,20 @@ public class BalanceListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onChangeBalance(Income income) {
-        incomeRepository.save(income);
+        try {
+            incomeRepository.save(income);
+        } catch (Exception e) {
+            throw new RuntimeException("dont save income " + e);
+        }
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onChangeBalance(Expense expense) {
-        expenseRepository.save(expense);
+        try {
+            expenseRepository.save(expense);
+        } catch (Exception e) {
+            throw new RuntimeException("dont save expense " + e);
+        }
     }
 }

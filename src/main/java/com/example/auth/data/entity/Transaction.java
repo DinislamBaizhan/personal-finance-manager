@@ -1,5 +1,6 @@
 package com.example.auth.data.entity;
 
+import com.example.auth.data.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,14 +36,18 @@ public class Transaction implements Serializable {
     private String description;
 
     @Column(nullable = false)
-    private Long cardId;
+    private Long accountId;
 
     @Column(nullable = false)
-    private String cardName;
+    private String accountName;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
 
     @JsonIgnore
     @ManyToOne

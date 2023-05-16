@@ -54,7 +54,7 @@ public class Debt {
     @PostUpdate
     @PostPersist
     public void checkIndebtedness() {
-        if (indebtedness.compareTo(BigDecimal.ZERO) == 0) {
+        if (indebtedness.compareTo(BigDecimal.ZERO) <= 0.00) {
             active = false;
         }
     }

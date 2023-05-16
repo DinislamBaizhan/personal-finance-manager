@@ -1,6 +1,7 @@
 package com.example.auth.api;
 
 import com.example.auth.data.entity.Debt;
+import com.example.auth.data.entity.Expense;
 import com.example.auth.service.CreditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -56,8 +58,18 @@ public class CreditController {
         return creditService.getAllNotActive();
     }
 
-//    @PostMapping("/{creditId}/repay")
-//    public Debt repay(@RequestBody Expense expense, @PathVariable Long creditId) {
-//
-//    }
+    @PostMapping("/{creditId}/repay")
+    public Debt repay(@RequestBody Expense expense, @PathVariable Long creditId) {
+        return creditService.repay(expense, creditId);
+    }
+
+    @PostMapping("/{creditId}/increase-credit")
+    public Debt increaseLoan(@PathVariable Long creditId, @RequestParam BigDecimal amount) {
+        return creditService.increaseCredit(creditId, amount);
+    }
+
+    @PatchMapping("/{creditId}/activity")
+    public boolean inactive(@PathVariable Long creditId, @RequestParam boolean status) {
+        return creditService.setActivity(creditId, status);
+    }
 }

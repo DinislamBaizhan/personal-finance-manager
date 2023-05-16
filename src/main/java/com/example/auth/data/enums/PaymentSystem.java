@@ -1,6 +1,6 @@
 package com.example.auth.data.enums;
 
-public enum CardType {
+public enum PaymentSystem {
     VISA,
     MASTERCARD,
     UNIONPAY,

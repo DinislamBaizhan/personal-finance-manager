@@ -1,7 +1,7 @@
 package com.example.auth.data.entity;
 
 import com.example.auth.data.base.Account;
-import com.example.auth.data.enums.CardType;
+import com.example.auth.data.enums.PaymentSystem;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -46,5 +46,5 @@ public class CardAccount extends Account {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private CardType cardType;
+    private PaymentSystem paymentSystem;
 }

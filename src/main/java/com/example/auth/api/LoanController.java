@@ -1,9 +1,8 @@
 package com.example.auth.api;
 
 import com.example.auth.data.entity.Debt;
-import com.example.auth.repository.CategoryRepository;
-import com.example.auth.repository.IncomeRepository;
-import com.example.auth.repository.TransactionRepository;
+import com.example.auth.data.entity.Expense;
+import com.example.auth.service.CreditService;
 import com.example.auth.service.LoanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,11 +21,8 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class LoanController {
 
-    private final IncomeRepository incomeRepository;
-    private final CategoryRepository categoryRepository;
-    private final TransactionRepository transactionRepository;
-
     private final LoanService loanService;
+    private final CreditService creditService;
 
     @PostMapping
     @Operation(summary = "Create a new loan")
@@ -85,33 +82,18 @@ public class LoanController {
         return loanService.getAllNotActive();
     }
 
+    @PostMapping("/{loanId}/repay")
+    public Debt repay(@RequestBody Expense expense, @PathVariable Long loanId) {
+        return loanService.repay(expense, loanId);
+    }
 
-//    @PostMapping("/income")
-//    public Income createIncome(@RequestBody Income income) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userRepository.findByEmail(authentication.getName()).get();
-//        Category category = categoryRepository.findById(1L).get();
-//
-//        income.setUser(user);
-//        income.setCategory(category);
-//
-//
-//        return incomeRepository.save(income);
-//    }
-//
-//    @GetMapping("/income")
-//    public List<Income> getIncome() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userRepository.findByEmail(authentication.getName()).get();
-//
-//        return incomeRepository.findAllByUserIdAndCardId(user.getId(), 2L);
-//    }
-//
-//    @GetMapping("/t/{cardId}")
-//    public List<Transaction> trans(@PathVariable Long cardId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userRepository.findByEmail(authentication.getName()).get();
-//
-//        return transactionRepository.findAllByUserIdAndCardId(user.getId(), cardId);
-//    }
+    @PostMapping("/{loanId}/increase-loan")
+    public Debt increaseLoan(@PathVariable Long loanId, @RequestParam BigDecimal amount) {
+        return loanService.increaseLoan(loanId, amount);
+    }
+
+    @PatchMapping("/{loanId}/activity")
+    public boolean inactive(@PathVariable Long loanId, @RequestParam boolean condition) {
+        return creditService.setActivity(loanId, condition);
+    }
 }

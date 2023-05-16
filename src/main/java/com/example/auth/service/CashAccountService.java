@@ -64,7 +64,7 @@ public class CashAccountService {
     public CashAccount addMoney(Income income, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("category not found"));
-        CashAccount cashAccount = getById(income.getCardId());
+        CashAccount cashAccount = getById(income.getAccountId());
         cashAccount.addMoney(income.getAmount());
         income.setUser(cashAccount.getUser());
         income.setCategory(category);
@@ -76,20 +76,23 @@ public class CashAccountService {
 
     @Transactional
     public CashAccount subtractMoney(Expense expense, Long categoryId) {
-        CashAccount cashAccount = getById(expense.getCardId());
+        CashAccount cashAccount = getById(expense.getAccountId());
+        BigDecimal balance = cashAccount.getBalance();
+        BigDecimal amount = expense.getAmount();
 
-        if (cashAccount.getBalance().compareTo(expense.getAmount()) < 0) {
+        if (balance.compareTo(amount) < 0) {
             throw new InsufficientFundsException("not money");
+        } else {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new DataNotFound("category not found"));
+
+            cashAccount.subtractMoney(expense.getAmount());
+            expense.setUser(cashAccount.getUser());
+            expense.setCategory(category);
+
+            CashAccount newAccount = cashRepository.save(cashAccount);
+            eventPublisher.publishEvent(expense);
+            return newAccount;
         }
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new DataNotFound("category not found"));
-
-        cashAccount.subtractMoney(expense.getAmount());
-        expense.setUser(cashAccount.getUser());
-        expense.setCategory(category);
-
-        CashAccount newAccount = cashRepository.save(cashAccount);
-        eventPublisher.publishEvent(expense);
-        return newAccount;
     }
 }

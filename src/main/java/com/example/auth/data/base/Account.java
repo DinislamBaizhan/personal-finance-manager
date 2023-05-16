@@ -1,6 +1,7 @@
 package com.example.auth.data.base;
 
 import com.example.auth.data.entity.User;
+import com.example.auth.data.enums.AccountType;
 import com.example.auth.data.enums.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -51,7 +52,11 @@ public abstract class Account implements Serializable {
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
-    public User user;
+    private User user;
+    
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
 
     public void addMoney(BigDecimal money) {
         balance = balance.add(money);

@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface IncomeRepository extends JpaRepository<Income, Long> {
 
-    List<Income> findAllByUserIdAndCardId(Long userId, Long cardId);
+    List<Income> findAllByUserIdAndAccountId(Long userId, Long accountId);
 
 }
