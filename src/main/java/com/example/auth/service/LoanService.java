@@ -73,8 +73,8 @@ public class LoanService {
             loan.subtractMoney(expense.getAmount());
 
             switch (expense.getAccountType()) {
-                case CARD -> cardAccountService.subtractMoney(expense, 1L); // TODO: написать готовую категорию
-                case CASH -> cashAccountService.subtractMoney(expense, 1L); // TODO: написать готовую категорию
+                case CARD -> cardAccountService.subtractMoney(expense, 13L);
+                case CASH -> cashAccountService.subtractMoney(expense, 13L);
             }
             return debtRepository.save(loan);
         }

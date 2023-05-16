@@ -1,10 +1,6 @@
 package com.example.auth.data.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,13 +11,19 @@ import java.io.Serializable;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Category implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String name;
+    @Column(nullable = false)
     private String color;
-
+    @Column(nullable = false)
     private String icon;
+
+    public Category(String name, String icon, String color) {
+        this.name = name;
+        this.icon = icon;
+        this.color = color;
+    }
 }
