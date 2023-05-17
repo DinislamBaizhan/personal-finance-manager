@@ -5,6 +5,7 @@ import com.example.auth.data.enums.AccountType;
 import com.example.auth.exception.DataNotFound;
 import com.example.auth.exception.InsufficientFundsException;
 import com.example.auth.repository.CardAccountRepository;
+import com.example.auth.repository.CashAccountRepository;
 import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +27,7 @@ public class CardAccountService {
     private final CardAccountRepository cardAccountRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CategoryRepository categoryRepository;
+    private final CashAccountRepository cashAccountRepository;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +67,7 @@ public class CardAccountService {
     @Transactional
     public CardAccount addMoney(Income income, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("category not found"));
+                .orElseThrow();
         CardAccount cardAccount = getById(income.getAccountId());
         cardAccount.addMoney(income.getAmount());
         income.setUser(cardAccount.getUser());
@@ -93,7 +95,7 @@ public class CardAccountService {
             expense.setUser(cardAccount.getUser());
             expense.setCategory(category);
             expense.setAccountName(cardAccount.getName());
-            expense.setAccountType(AccountType.CASH);
+            expense.setAccountType(AccountType.CARD);
 
             CardAccount newAccount = cardAccountRepository.save(cardAccount);
             eventPublisher.publishEvent(expense);

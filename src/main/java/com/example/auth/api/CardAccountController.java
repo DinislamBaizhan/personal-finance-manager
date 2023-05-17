@@ -3,7 +3,9 @@ package com.example.auth.api;
 import com.example.auth.data.entity.CardAccount;
 import com.example.auth.data.entity.Expense;
 import com.example.auth.data.entity.Income;
+import com.example.auth.data.enums.AccountType;
 import com.example.auth.service.CardAccountService;
+import com.example.auth.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,8 +24,8 @@ import java.util.List;
 @Tag(name = "card account controller", description = "Card account management")
 @SecurityRequirement(name = "bearerAuth")
 public class CardAccountController {
-
     private final CardAccountService cardAccountService;
+    private final TransferService transferService;
 
     @PostMapping
     @Operation(summary = "Create a new card account")
@@ -81,5 +83,13 @@ public class CardAccountController {
     })
     public CardAccount getById(@RequestBody Expense expense, @RequestParam @Parameter(description = "ID of the category to assign to the expense") Long categoryId) {
         return cardAccountService.subtractMoney(expense, categoryId);
+    }
+
+    @PatchMapping("/{fromId}/transfer/{toId}")
+    public CardAccount transferAccounts(@PathVariable Long fromId,
+                                        @PathVariable Long toId,
+                                        @RequestParam("accountType") AccountType accountType,
+                                        @RequestParam("amount") BigDecimal amount) {
+        return transferService.transferFromCardAccount(fromId, toId, accountType, amount);
     }
 }

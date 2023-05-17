@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 
 @Data
 public class TransactionDTO {
-    private Long cardId;
     private Long categoryId;
     private String description;
     private BigDecimal amount;

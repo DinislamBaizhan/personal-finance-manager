@@ -5,6 +5,7 @@ import com.example.auth.data.entity.Income;
 import com.example.auth.repository.ExpenseRepository;
 import com.example.auth.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -22,7 +23,7 @@ public class BalanceListener {
     public void onChangeBalance(Income income) {
         try {
             incomeRepository.save(income);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException("dont save income " + e);
         }
     }
@@ -32,7 +33,7 @@ public class BalanceListener {
     public void onChangeBalance(Expense expense) {
         try {
             expenseRepository.save(expense);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException("dont save expense " + e);
         }
     }

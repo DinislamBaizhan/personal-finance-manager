@@ -2,16 +2,16 @@ package com.example.auth.data.entity;
 
 import com.example.auth.data.enums.Currency;
 import com.example.auth.data.enums.DebtType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Description;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -29,8 +29,8 @@ public class Debt {
 
     @Column(name = "created_at", nullable = false,
             updatable = false)
-    @CreatedDate
-    private LocalDate createdAt = LocalDate.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     protected boolean active = true;
 

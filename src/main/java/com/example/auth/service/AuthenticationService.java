@@ -10,6 +10,7 @@ import com.example.auth.data.request.AuthenticationRequest;
 import com.example.auth.data.response.AuthenticationResponse;
 import com.example.auth.repository.TokenRepository;
 import com.example.auth.repository.UserRepository;
+import com.example.auth.utils.DecodedToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

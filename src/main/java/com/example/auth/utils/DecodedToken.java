@@ -1,4 +1,4 @@
-package com.example.auth.service;
+package com.example.auth.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

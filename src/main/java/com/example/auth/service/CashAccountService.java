@@ -1,8 +1,8 @@
 package com.example.auth.service;
 
 import com.example.auth.data.entity.*;
-import com.example.auth.exception.DataNotFound;
 import com.example.auth.exception.InsufficientFundsException;
+import com.example.auth.repository.CardAccountRepository;
 import com.example.auth.repository.CashAccountRepository;
 import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
@@ -25,11 +25,17 @@ public class CashAccountService {
     private final CashAccountRepository cashRepository;
     private final CategoryRepository categoryRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final CardAccountRepository cardAccountRepository;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+    }
+
+    private Category getCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow();
     }
 
     public CashAccount save(CashAccount cashAccount) {
@@ -62,8 +68,8 @@ public class CashAccountService {
 
     @Transactional
     public CashAccount addMoney(Income income, Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("category not found"));
+
+        Category category = getCategory(categoryId);
         CashAccount cashAccount = getById(income.getAccountId());
         cashAccount.addMoney(income.getAmount());
         income.setUser(cashAccount.getUser());
@@ -76,6 +82,7 @@ public class CashAccountService {
 
     @Transactional
     public CashAccount subtractMoney(Expense expense, Long categoryId) {
+
         CashAccount cashAccount = getById(expense.getAccountId());
         BigDecimal balance = cashAccount.getBalance();
         BigDecimal amount = expense.getAmount();
@@ -83,8 +90,7 @@ public class CashAccountService {
         if (balance.compareTo(amount) < 0) {
             throw new InsufficientFundsException("not money");
         } else {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new DataNotFound("category not found"));
+            Category category = getCategory(categoryId);
 
             cashAccount.subtractMoney(expense.getAmount());
             expense.setUser(cashAccount.getUser());

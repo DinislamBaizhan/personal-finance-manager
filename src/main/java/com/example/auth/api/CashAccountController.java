@@ -3,7 +3,9 @@ package com.example.auth.api;
 import com.example.auth.data.entity.CashAccount;
 import com.example.auth.data.entity.Expense;
 import com.example.auth.data.entity.Income;
+import com.example.auth.data.enums.AccountType;
 import com.example.auth.service.CashAccountService;
+import com.example.auth.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +25,7 @@ import java.util.List;
 public class CashAccountController {
 
     private final CashAccountService cashAccountService;
+    private final TransferService transferService;
 
     @PostMapping
     @Operation(summary = "Create a new cash account")
@@ -75,7 +78,15 @@ public class CashAccountController {
                     schema = @Schema(implementation = CashAccount.class)))
     @ApiResponse(responseCode = "400", description = "Insufficient balance or invalid expense data")
     @ApiResponse(responseCode = "404", description = "Cash account is not found")
-    public CashAccount getById(@RequestBody Expense expense, @Parameter(description = "ID for Category",required = true) @RequestParam Long categoryId) throws Exception {
+    public CashAccount getById(@RequestBody Expense expense, @Parameter(description = "ID for Category", required = true) @RequestParam Long categoryId) throws Exception {
         return cashAccountService.subtractMoney(expense, categoryId);
+    }
+
+    @PatchMapping("/{fromId}/transfer/{toId}")
+    public CashAccount transferAccounts(@PathVariable Long fromId,
+                                        @PathVariable Long toId,
+                                        @RequestParam("accountType") AccountType accountType,
+                                        @RequestParam("amount") BigDecimal amount) {
+        return transferService.transferFromCashAccount(fromId, toId, accountType, amount);
     }
 }

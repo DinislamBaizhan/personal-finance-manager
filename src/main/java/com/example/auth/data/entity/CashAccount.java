@@ -13,15 +13,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "cash_accounts")
 public class CashAccount extends Account {
-
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "income_id")
-//    private List<Income> incomeList = new ArrayList<>();
-//
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "expense_id")
-//    private List<Expense> expenseList = new ArrayList<>();
 }
 

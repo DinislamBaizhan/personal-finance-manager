@@ -1,6 +1,7 @@
 package com.example.auth.data.entity;
 
 import com.example.auth.data.enums.AccountType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,11 +10,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -27,8 +27,8 @@ public class Transaction implements Serializable {
 
     @Column(name = "created_at", nullable = false,
             updatable = false)
-    @CreatedDate
-    private LocalDate createdAt = LocalDate.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
     private BigDecimal amount;
