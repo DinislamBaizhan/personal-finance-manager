@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -83,10 +84,14 @@ public class CashAccountController {
     }
 
     @PatchMapping("/{fromId}/transfer/{toId}")
+    @Operation(summary = "Transfer money between cash accounts")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully transferred money")
+    })
     public CashAccount transferAccounts(@PathVariable Long fromId,
                                         @PathVariable Long toId,
-                                        @RequestParam("accountType") AccountType accountType,
-                                        @RequestParam("amount") BigDecimal amount) {
+                                        @Parameter(description = "Type of the account to transfer money from/to") @RequestParam("accountType") AccountType accountType,
+                                        @Parameter(description = "Amount of money to transfer") @RequestParam("amount") BigDecimal amount) {
         return transferService.transferFromCashAccount(fromId, toId, accountType, amount);
     }
 }

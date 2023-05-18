@@ -86,10 +86,15 @@ public class CardAccountController {
     }
 
     @PatchMapping("/{fromId}/transfer/{toId}")
+    @Operation(summary = "Transfer funds between card accounts")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully transfer"),
+            @ApiResponse(responseCode = "404", description = "Card accounts not found")
+    })
     public CardAccount transferAccounts(@PathVariable Long fromId,
                                         @PathVariable Long toId,
-                                        @RequestParam("accountType") AccountType accountType,
-                                        @RequestParam("amount") BigDecimal amount) {
+                                        @Parameter(description = "Type of the account") @RequestParam("accountType") AccountType accountType,
+                                        @Parameter(description = "Amount to transfer") @RequestParam("amount") BigDecimal amount) {
         return transferService.transferFromCardAccount(fromId, toId, accountType, amount);
     }
 }

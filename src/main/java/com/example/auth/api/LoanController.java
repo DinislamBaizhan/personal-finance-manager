@@ -83,17 +83,32 @@ public class LoanController {
     }
 
     @PostMapping("/{loanId}/repay")
-    public Debt repay(@RequestBody Expense expense, @PathVariable Long loanId) {
+    @Operation(summary = "Repay a loan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Loan repaid successfully"),
+            @ApiResponse(responseCode = "404", description = "Loan not found")
+    })
+    public Debt repay(@RequestBody Expense expense, @Parameter(description = "ID of the Loan") @PathVariable Long loanId) {
         return loanService.repay(expense, loanId);
     }
 
     @PostMapping("/{loanId}/increase-loan")
-    public Debt increaseLoan(@PathVariable Long loanId, @RequestParam BigDecimal amount) {
+    @Operation(summary = "Increase loan amount")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Loan amount increased successfully"),
+            @ApiResponse(responseCode = "404", description = "Loan not found")
+    })
+    public Debt increaseLoan(@Parameter(description = "Id of the Loan") @PathVariable Long loanId, @Parameter(description = "Amount to increase") @RequestParam BigDecimal amount) {
         return loanService.increaseLoan(loanId, amount);
     }
 
     @PatchMapping("/{loanId}/activity")
-    public boolean inactive(@PathVariable Long loanId, @RequestParam boolean condition) {
+    @Operation(summary = "Set loan activity status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Loan activity status updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Loan not found")
+    })
+    public boolean inactive(@Parameter(description = "ID of the loan") @PathVariable Long loanId, @Parameter(description = "condition of the status") @RequestParam boolean condition) {
         return creditService.setActivity(loanId, condition);
     }
 }
