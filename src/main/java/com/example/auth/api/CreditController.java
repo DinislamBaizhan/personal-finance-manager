@@ -6,6 +6,7 @@ import com.example.auth.service.CreditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -59,17 +60,32 @@ public class CreditController {
     }
 
     @PostMapping("/{creditId}/repay")
-    public Debt repay(@RequestBody Expense expense, @PathVariable Long creditId) {
+    @Operation(summary = "Repay a credit",description = "Repay a credit by credit ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Credit repaid successfully"),
+            @ApiResponse(responseCode = "404", description = "Credit not found")
+    })
+    public Debt repay(@RequestBody Expense expense,@Parameter(description = "ID of the credit") @PathVariable Long creditId) {
         return creditService.repay(expense, creditId);
     }
 
     @PostMapping("/{creditId}/increase-credit")
-    public Debt increaseLoan(@PathVariable Long creditId, @RequestParam BigDecimal amount) {
+    @Operation(summary = "Increase credit amount",description = "Increase the credit amount by providing the credit ID and amount")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Credit amount increased successfully"),
+            @ApiResponse(responseCode = "404", description = "Credit not found")
+    })
+    public Debt increaseLoan(@Parameter(description = "ID of the credit") @PathVariable Long creditId, @Parameter(description = "Amount to increase credit") @RequestParam BigDecimal amount) {
         return creditService.increaseCredit(creditId, amount);
     }
 
     @PatchMapping("/{creditId}/activity")
-    public boolean inactive(@PathVariable Long creditId, @RequestParam boolean status) {
+    @Operation(summary = "Set credit activity status",description = "Set the activity status of a credit by providing the credit ID and status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Credit activity status updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Credit not found")
+    })
+    public boolean inactive(@Parameter(description = "ID of the credit") @PathVariable Long creditId, @Parameter(description = "Activity status") @RequestParam boolean status) {
         return creditService.setActivity(creditId, status);
     }
 }
