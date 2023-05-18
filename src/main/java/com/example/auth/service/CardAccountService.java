@@ -97,9 +97,8 @@ public class CardAccountService {
             expense.setAccountName(cardAccount.getName());
             expense.setAccountType(AccountType.CARD);
 
-            CardAccount newAccount = cardAccountRepository.save(cardAccount);
             eventPublisher.publishEvent(expense);
-            return newAccount;
+            return cardAccountRepository.save(cardAccount);
         }
     }
 }

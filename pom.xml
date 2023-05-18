@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.example</groupId>
     <artifactId>Auth-server</artifactId>
@@ -15,7 +15,6 @@
     <description>Auth-server</description>
     <properties>
         <java.version>17</java.version>
-        <!--        <logstash.host>com.example.auth</logstash.host>-->
     </properties>
     <dependencies>
         <dependency>
@@ -122,6 +121,12 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.7.1</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

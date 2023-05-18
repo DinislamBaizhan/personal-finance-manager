@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 .csrf().disable().cors(Customizer.withDefaults())
                 .formLogin().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**")
+                .requestMatchers("/api/v1/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/test")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

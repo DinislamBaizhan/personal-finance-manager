@@ -27,7 +27,7 @@ public class Transaction implements Serializable {
 
     @Column(name = "created_at", nullable = false,
             updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
@@ -44,7 +44,7 @@ public class Transaction implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
