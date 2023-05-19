@@ -1,6 +1,7 @@
 package com.example.auth.data.entity;
 
 import com.example.auth.data.enums.AccountType;
+import com.example.auth.data.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -27,7 +28,7 @@ public class Transaction implements Serializable {
 
     @Column(name = "created_at", nullable = false,
             updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
@@ -44,10 +45,13 @@ public class Transaction implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
 
     @JsonIgnore
     @ManyToOne

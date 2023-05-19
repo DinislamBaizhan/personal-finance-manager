@@ -2,6 +2,7 @@ package com.example.auth.service;
 
 import com.example.auth.data.entity.*;
 import com.example.auth.data.enums.AccountType;
+import com.example.auth.data.enums.TransactionType;
 import com.example.auth.exception.InsufficientFundsException;
 import com.example.auth.repository.CardAccountRepository;
 import com.example.auth.repository.CashAccountRepository;
@@ -76,7 +77,8 @@ public class CashAccountService {
         income.setUser(cashAccount.getUser());
         income.setCategory(category);
         income.setAccountName(cashAccount.getName());
-        income.setAccountType(AccountType.CARD);
+        income.setAccountType(AccountType.CASH);
+        income.setTransactionType(TransactionType.INCOME);
 
         eventPublisher.publishEvent(income);
         return cashRepository.save(cashAccount);
@@ -98,8 +100,9 @@ public class CashAccountService {
             expense.setUser(cashAccount.getUser());
             expense.setCategory(category);
             expense.setAccountName(cashAccount.getName());
-            expense.setAccountType(AccountType.CARD);
-            
+            expense.setAccountType(AccountType.CASH);
+            expense.setTransactionType(TransactionType.EXPENSE);
+
             eventPublisher.publishEvent(expense);
             return cashRepository.save(cashAccount);
         }

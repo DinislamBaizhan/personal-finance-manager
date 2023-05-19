@@ -24,11 +24,11 @@ public class TransferService {
 
         // категория перевод
         if (accountType == AccountType.CARD) {
-            cardAccountService.addMoney(income, 4L); // категория перевод
+            cardAccountService.addMoney(income, 5L); // категория перевод
         } else {
-            cashAccountService.addMoney(income, 4L); // категория перевод
+            cashAccountService.addMoney(income, 5L); // категория перевод
         }
-        return cardAccountService.subtractMoney(expense, 4L); // категория перевод
+        return cardAccountService.subtractMoney(expense, 5L); // категория перевод
     }
 
     @Transactional
@@ -38,11 +38,11 @@ public class TransferService {
 
         // категория перевод
         if (accountType == AccountType.CARD) {
-            cardAccountService.addMoney(income, 4L); // категория перевод
+            cardAccountService.addMoney(income, 5L); // категория перевод
         } else {
-            cashAccountService.addMoney(income, 4L); // категория перевод
+            cashAccountService.addMoney(income, 5L); // категория перевод
         }
-        return cashAccountService.subtractMoney(expense, 4L); // категория перевод
+        return cashAccountService.subtractMoney(expense, 5L); // категория перевод
     }
 
     private Expense createExpense(Long accountId, BigDecimal amount) {

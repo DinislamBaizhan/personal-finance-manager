@@ -12,6 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+/csv/
 src/main/resources/.env
 
 ### IntelliJ IDEA ###
@@ -32,3 +33,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/csv/

@@ -25,9 +25,12 @@ public class CSVController {
     private final StatisticsService statisticsService;
 
     @GetMapping("/download-csv")
-    public ResponseEntity<Resource> downloadCSV(@RequestParam("start") LocalDateTime start, @RequestParam("finish") LocalDateTime finish) throws IOException {
+    public ResponseEntity<Resource> downloadCSV(
+            @RequestParam("start") LocalDateTime start,
+            @RequestParam("finish") LocalDateTime finish
+    ) throws IOException {
         try {
-            File csvFile = statisticsService.generateCVS(start, finish);
+            File csvFile = statisticsService.generateCSV(start, finish);
             Path path = csvFile.toPath();
             ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 

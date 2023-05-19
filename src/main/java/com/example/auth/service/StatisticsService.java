@@ -17,12 +17,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -53,8 +55,8 @@ public class StatisticsService {
 
     public List<Income> getIncomesForDay(LocalDateTime before, LocalDateTime after) {
         User user = getCurrentUser();
-
-        return incomeRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
+        List<Income> income = incomeRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
+        return income;
     }
 
     public List<Expense> getExpensesForDay(LocalDateTime before, LocalDateTime after) {
@@ -62,10 +64,10 @@ public class StatisticsService {
         return expenseRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
     }
 
-    public File generateCVS(LocalDateTime before, LocalDateTime after) throws IOException {
 
-        String fileName = "transactions " + before + "after " + after + ".csv";
-        String path = Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).getPath();
+    public File generateCSV(LocalDateTime before, LocalDateTime after) throws IOException {
+
+        Path filePath = getPath(before, after);
 
         List<Expense> expenseList = getExpensesForDay(before, after);
         List<Income> incomeList = getIncomesForDay(before, after);
@@ -74,8 +76,8 @@ public class StatisticsService {
         combinedList.addAll(expenseList);
         combinedList.addAll(incomeList);
 
-        try (CSVWriter writer = new CSVWriter(new FileWriter(path))) {
-            String[] headers = {"date", "account name", "account type", "amount", "description", "category"};
+        try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(filePath))) {
+            String[] headers = {"date", "account name", "account type", "amount", "description", "category", "transaction type"};
             writer.writeNext(headers);
 
             for (Transaction transaction : combinedList) {
@@ -85,13 +87,30 @@ public class StatisticsService {
                         String.valueOf(transaction.getAccountType()),
                         String.valueOf(transaction.getAmount()),
                         transaction.getDescription(),
-                        transaction.getCategory().getName()
+                        transaction.getCategory().getName(),
+                        String.valueOf(transaction.getTransactionType())
                 };
                 writer.writeNext(data);
             }
         } catch (IOException ex) {
-            throw new IOException("failed to csv");
+            throw new IOException("Failed to create CSV file.");
         }
-        return new File(path);
+        return filePath.toFile();
+    }
+
+    private static Path getPath(LocalDateTime before, LocalDateTime after) throws IOException {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String fileName = "csv/transactions_" + before + "_after_" + after + "_" + timestamp + ".csv";
+        fileName = fileName.replace(':', '_');
+        Path filePath = Paths.get(fileName);
+
+        if (!Files.exists(filePath.getParent())) {
+            Files.createDirectories(filePath.getParent());
+        }
+
+        if (!Files.exists(filePath)) {
+            Files.createFile(filePath);
+        }
+        return filePath;
     }
 }
