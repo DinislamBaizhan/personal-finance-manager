@@ -7,9 +7,8 @@ import com.example.auth.data.enums.Role;
 import com.example.auth.exception.DataNotFound;
 import com.example.auth.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,18 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final ObjectMapper objectMapper;
-    Logger logger = LogManager.getLogger();
-
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
-        this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-        this.objectMapper = objectMapper;
-    }
 
 
     public User getAuthenticatedProfile() {
@@ -53,7 +46,7 @@ public class UserService {
     public User findByEmail(String email) {
         return repository.findByEmail(email).orElseThrow(
                 () -> {
-                    logger.error("user not found %s", email);
+                    log.error("user not found %s", email);
                     return new DataNotFound("profile not found");
                 }
         );
@@ -72,7 +65,7 @@ public class UserService {
         User user = getAuthenticatedProfile();
         user.setFirstname(name.get(0));
         user.setLastname(name.get(1));
-        logger.info("rename: firstname - %s", name.get(0), "lastname - %s", name.get(1));
+        log.info("rename: firstname - %s", name.get(0), "lastname - %s", name.get(1));
         repository.save(user);
         return getDTO();
     }
@@ -81,7 +74,7 @@ public class UserService {
 //        UserDTO DTO = objectMapper.readValue(link, UserDTO.class);
         User user = getAuthenticatedProfile();
         save(user);
-        logger.info("add icon");
+        log.info("add icon");
         return getDTO();
     }
 
@@ -103,9 +96,9 @@ public class UserService {
         User user = getAuthenticatedProfile();
         try {
             repository.delete(user);
-            logger.info("profile deleted " + user.getEmail());
+            log.info("profile deleted " + user.getEmail());
         } catch (DataAccessException e) {
-            logger.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
+            log.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
             throw new DataNotFound("profile not found " + e.getMessage());
         }
     }
@@ -130,7 +123,7 @@ public class UserService {
         try {
             return repository.save(profile);
         } catch (DataAccessException e) {
-            logger.error("fail save to database %s", profile);
+            log.error("fail save to database %s", profile);
             throw new RuntimeException("fail save to database " + profile);
         }
     }

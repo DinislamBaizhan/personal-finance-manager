@@ -14,8 +14,7 @@ import com.example.auth.utils.DecodedToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -29,6 +28,7 @@ import org.springframework.web.server.ServerErrorException;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -42,7 +42,6 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final ConfirmationTokenService confirmationTokenService;
     private final ApplicationEventPublisher eventPublisher;
-    Logger logger = LogManager.getLogger();
 
     @Transactional
     public void register(@Valid RegisterDTO registerDTO) throws Exception {
@@ -119,7 +118,7 @@ public class AuthenticationService {
             var jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
             revokeAllUserTokens(profile);
             saveUserToken(profile, jwtToken);
-            logger.info("Authentication");
+            log.info("Authentication");
             return new AuthenticationResponse(
                     jwtToken
             );
@@ -137,9 +136,9 @@ public class AuthenticationService {
         );
         try {
             tokenRepository.saveAndFlush(token);
-            logger.info("Token saved for user with id {}", profile.getId());
+            log.info("Token saved for user with id {}", profile.getId());
         } catch (DataAccessException ex) {
-            logger.error("Failed to save token for user with id {}", profile.getId(), ex);
+            log.error("Failed to save token for user with id {}", profile.getId(), ex);
             throw new ServerErrorException("Failed to save token for user with id " + profile.getId(), ex);
         }
     }
@@ -147,7 +146,7 @@ public class AuthenticationService {
     public void revokeAllUserTokens(User profile) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(profile.getId());
         if (validUserTokens.isEmpty()) {
-            logger.info("tokens not found");
+            log.info("tokens not found");
             return;
         }
         validUserTokens.forEach(token -> {
@@ -157,7 +156,7 @@ public class AuthenticationService {
         try {
             tokenRepository.saveAll(validUserTokens);
         } catch (Exception e) {
-            logger.error("Failed to save all tokens\", e.getCause()");
+            log.error("Failed to save all tokens\", e.getCause()");
             throw new ServerErrorException("Failed to save all tokens", e.getCause());
         }
     }

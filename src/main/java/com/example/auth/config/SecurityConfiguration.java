@@ -46,8 +46,7 @@ public class SecurityConfiguration {
                 .logout()
                 .logoutUrl("/api/v1/auth/logout")
                 .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
-
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()).and();
         return http.build();
     }
 
@@ -55,6 +54,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("https://localhost:3000"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

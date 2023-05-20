@@ -83,7 +83,6 @@ public class AuthenticationController {
                                                 @RequestParam("token") String token,
                                                 @RequestParam("password") String password
     ) throws Exception {
-
         service.updatePassword(password, token);
         return ResponseEntity.ok("your password has been successfully updated");
     }

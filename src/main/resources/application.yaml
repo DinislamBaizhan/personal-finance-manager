@@ -1,9 +1,19 @@
 server:
+  port: 8443
+  ssl:
+    key-store: classpath:springboot.p12
+    key-store-password: password
+    key-store-type: pkcs12
+    key-alias: springboot
+    key-password: password
   error:
     include-exception: true
     include-message: always
     include-stacktrace: always
 spring:
+  output:
+    ansi:
+      enabled: always
   servlet:
     multipart:
       enabled: true
@@ -39,3 +49,9 @@ spring:
           starttls:
             enable: true
             required: true
+logging:
+  level:
+    root: "debug"
+    org.hibernate: "error"
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} [%level] %c{1.} [%t] %m%n"
