@@ -4,7 +4,6 @@ import com.example.auth.data.base.Account;
 import com.example.auth.data.enums.PaymentSystem;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +33,7 @@ public class CardAccount extends Account {
     @Column(name = "card_number")
     private String cardNumber = "XXXX-XXXX-XXXX-XXXX";
 
-    @Column(name = "CVV/CVC")
+    @Column(name = "CVV_CVC")
     @Size(min = 3, max = 3, message = "CVV/CVC code must be 3 characters long")
     private String CVV = "XXX";
 
@@ -44,7 +43,6 @@ public class CardAccount extends Account {
             pattern = "MM/yy")
     private LocalDate expiredDate;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private PaymentSystem paymentSystem;
 }

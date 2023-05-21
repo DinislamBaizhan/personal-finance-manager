@@ -1,13 +1,11 @@
 package com.example.auth.service;
 
-import com.example.auth.data.entity.*;
+import com.example.auth.data.entity.CardAccount;
+import com.example.auth.data.entity.Expense;
+import com.example.auth.data.entity.Income;
+import com.example.auth.data.entity.User;
 import com.example.auth.data.enums.AccountType;
-import com.example.auth.data.enums.TransactionType;
-import com.example.auth.exception.DataNotFound;
-import com.example.auth.exception.InsufficientFundsException;
 import com.example.auth.repository.CardAccountRepository;
-import com.example.auth.repository.CashAccountRepository;
-import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,8 +25,7 @@ public class CardAccountService {
     private final UserRepository userRepository;
     private final CardAccountRepository cardAccountRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final CategoryRepository categoryRepository;
-    private final CashAccountRepository cashAccountRepository;
+    private final AccountService<CardAccount> accountService;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,41 +64,24 @@ public class CardAccountService {
 
     @Transactional
     public CardAccount addMoney(Income income, Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow();
         CardAccount cardAccount = getById(income.getAccountId());
-        cardAccount.addMoney(income.getAmount());
-        income.setUser(cardAccount.getUser());
-        income.setCategory(category);
-        income.setAccountName(cardAccount.getName());
-        income.setAccountType(AccountType.CARD);
-        income.setTransactionType(TransactionType.INCOME);
+        CardAccount cardAccount1 = accountService.addMoney(cardAccount, income, categoryId);
 
         eventPublisher.publishEvent(income);
-        return cardAccountRepository.save(cardAccount);
+        return cardAccountRepository.save(cardAccount1);
     }
 
     @Transactional
     public CardAccount subtractMoney(Expense expense, Long categoryId) {
         CardAccount cardAccount = getById(expense.getAccountId());
-        BigDecimal balance = cardAccount.getBalance();
-        BigDecimal amount = expense.getAmount();
+        CardAccount cardAccount1 = accountService.subtractMoney(cardAccount, expense, categoryId);
+        eventPublisher.publishEvent(expense);
+        return cardAccountRepository.save(cardAccount1);
+    }
 
-        if (balance.compareTo(amount) < 0) {
-            throw new InsufficientFundsException("not money");
-        } else {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new DataNotFound("category not found"));
-
-            cardAccount.subtractMoney(expense.getAmount());
-            expense.setUser(cardAccount.getUser());
-            expense.setCategory(category);
-            expense.setAccountName(cardAccount.getName());
-            expense.setAccountType(AccountType.CARD);
-            expense.setTransactionType(TransactionType.EXPENSE);
-
-            eventPublisher.publishEvent(expense);
-            return cardAccountRepository.save(cardAccount);
-        }
+    public BigDecimal setLimit(Long carId, BigDecimal limit) {
+        CardAccount cardAccount = getById(carId);
+        cardAccount.setMoneyLimit(limit);
+        return cardAccountRepository.save(cardAccount).getMoneyLimit();
     }
 }

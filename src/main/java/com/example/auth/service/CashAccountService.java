@@ -1,12 +1,10 @@
 package com.example.auth.service;
 
-import com.example.auth.data.entity.*;
-import com.example.auth.data.enums.AccountType;
-import com.example.auth.data.enums.TransactionType;
-import com.example.auth.exception.InsufficientFundsException;
-import com.example.auth.repository.CardAccountRepository;
+import com.example.auth.data.entity.CashAccount;
+import com.example.auth.data.entity.Expense;
+import com.example.auth.data.entity.Income;
+import com.example.auth.data.entity.User;
 import com.example.auth.repository.CashAccountRepository;
-import com.example.auth.repository.CategoryRepository;
 import com.example.auth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -25,19 +23,13 @@ import java.util.List;
 public class CashAccountService {
     private final UserRepository userRepository;
     private final CashAccountRepository cashRepository;
-    private final CategoryRepository categoryRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final CardAccountRepository cardAccountRepository;
+    private final AccountService<CashAccount> accountService;
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
-    }
-
-    private Category getCategory(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow();
     }
 
     public CashAccount save(CashAccount cashAccount) {
@@ -70,41 +62,23 @@ public class CashAccountService {
 
     @Transactional
     public CashAccount addMoney(Income income, Long categoryId) {
-
-        Category category = getCategory(categoryId);
         CashAccount cashAccount = getById(income.getAccountId());
-        cashAccount.addMoney(income.getAmount());
-        income.setUser(cashAccount.getUser());
-        income.setCategory(category);
-        income.setAccountName(cashAccount.getName());
-        income.setAccountType(AccountType.CASH);
-        income.setTransactionType(TransactionType.INCOME);
-
+        CashAccount cashAccount1 = accountService.addMoney(cashAccount, income, categoryId);
         eventPublisher.publishEvent(income);
-        return cashRepository.save(cashAccount);
+        return cashRepository.save(cashAccount1);
     }
 
     @Transactional
     public CashAccount subtractMoney(Expense expense, Long categoryId) {
-
         CashAccount cashAccount = getById(expense.getAccountId());
-        BigDecimal balance = cashAccount.getBalance();
-        BigDecimal amount = expense.getAmount();
+        CashAccount cashAccount1 = accountService.subtractMoney(cashAccount, expense, categoryId);
+        eventPublisher.publishEvent(expense);
+        return cashRepository.save(cashAccount1);
+    }
 
-        if (balance.compareTo(amount) < 0) {
-            throw new InsufficientFundsException("not money");
-        } else {
-            Category category = getCategory(categoryId);
-
-            cashAccount.subtractMoney(expense.getAmount());
-            expense.setUser(cashAccount.getUser());
-            expense.setCategory(category);
-            expense.setAccountName(cashAccount.getName());
-            expense.setAccountType(AccountType.CASH);
-            expense.setTransactionType(TransactionType.EXPENSE);
-
-            eventPublisher.publishEvent(expense);
-            return cashRepository.save(cashAccount);
-        }
+    public BigDecimal setLimit(Long cashId, BigDecimal limit) {
+        CashAccount cashAccount = getById(cashId);
+        cashAccount.setMoneyLimit(limit);
+        return cashRepository.save(cashAccount).getMoneyLimit();
     }
 }

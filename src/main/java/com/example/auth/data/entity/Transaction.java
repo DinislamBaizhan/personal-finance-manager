@@ -29,7 +29,7 @@ public class Transaction implements Serializable {
     @Column(name = "created_at", nullable = false,
             updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private BigDecimal amount;

@@ -81,7 +81,7 @@ public class CardAccountController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Card account not found")
     })
-    public CardAccount getById(@RequestBody Expense expense, @RequestParam @Parameter(description = "ID of the category to assign to the expense") Long categoryId) {
+    public CardAccount subtract(@RequestBody Expense expense, @RequestParam @Parameter(description = "ID of the category to assign to the expense") Long categoryId) {
         return cardAccountService.subtractMoney(expense, categoryId);
     }
 
@@ -96,5 +96,10 @@ public class CardAccountController {
                                         @Parameter(description = "Type of the account") @RequestParam("accountType") AccountType accountType,
                                         @Parameter(description = "Amount to transfer") @RequestParam("amount") BigDecimal amount) {
         return transferService.transferFromCardAccount(fromId, toId, accountType, amount);
+    }
+
+    @PatchMapping("/{cardId}/limit")
+    public BigDecimal setLimit(@PathVariable Long cardId, @RequestParam("limit") BigDecimal limit) {
+        return cardAccountService.setLimit(cardId, limit);
     }
 }

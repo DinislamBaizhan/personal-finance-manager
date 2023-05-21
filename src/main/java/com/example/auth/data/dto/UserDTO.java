@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,4 +17,6 @@ public class UserDTO {
     private String firstname;
     private String lastname;
     private String email;
+    private BigDecimal sumOfAllMoney;
+    private BigDecimal debtSum;
 }

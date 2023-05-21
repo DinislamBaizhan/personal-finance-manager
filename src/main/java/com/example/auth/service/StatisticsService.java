@@ -34,6 +34,22 @@ public class StatisticsService {
     private final IncomeRepository incomeRepository;
     private final TransactionRepository transactionRepository;
 
+    private static Path getPath(LocalDateTime before, LocalDateTime after) throws IOException {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String fileName = "csv/transactions_" + before + "_after_" + after + "_" + timestamp + ".csv";
+        fileName = fileName.replace(':', '_');
+        Path filePath = Paths.get(fileName);
+
+        if (!Files.exists(filePath.getParent())) {
+            Files.createDirectories(filePath.getParent());
+        }
+
+        if (!Files.exists(filePath)) {
+            Files.createFile(filePath);
+        }
+        return filePath;
+    }
+
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(authentication.getName())
@@ -55,15 +71,13 @@ public class StatisticsService {
 
     public List<Income> getIncomesForDay(LocalDateTime before, LocalDateTime after) {
         User user = getCurrentUser();
-        List<Income> income = incomeRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
-        return income;
+        return incomeRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
     }
 
     public List<Expense> getExpensesForDay(LocalDateTime before, LocalDateTime after) {
         User user = getCurrentUser();
         return expenseRepository.findAllByUserIdAndCreatedAtBetween(user.getId(), before, after);
     }
-
 
     public File generateCSV(LocalDateTime before, LocalDateTime after) throws IOException {
 
@@ -96,21 +110,5 @@ public class StatisticsService {
             throw new IOException("Failed to create CSV file.");
         }
         return filePath.toFile();
-    }
-
-    private static Path getPath(LocalDateTime before, LocalDateTime after) throws IOException {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        String fileName = "csv/transactions_" + before + "_after_" + after + "_" + timestamp + ".csv";
-        fileName = fileName.replace(':', '_');
-        Path filePath = Paths.get(fileName);
-
-        if (!Files.exists(filePath.getParent())) {
-            Files.createDirectories(filePath.getParent());
-        }
-
-        if (!Files.exists(filePath)) {
-            Files.createFile(filePath);
-        }
-        return filePath;
     }
 }

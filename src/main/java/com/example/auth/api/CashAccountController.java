@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vi/cash-account")
+@RequestMapping("/api/v1/cash-account")
 @SecurityRequirement(name = "bearerAuth")
 public class CashAccountController {
 
@@ -93,5 +93,10 @@ public class CashAccountController {
                                         @Parameter(description = "Type of the account to transfer money from/to") @RequestParam("accountType") AccountType accountType,
                                         @Parameter(description = "Amount of money to transfer") @RequestParam("amount") BigDecimal amount) {
         return transferService.transferFromCashAccount(fromId, toId, accountType, amount);
+    }
+
+    @PatchMapping("/{cashId}/limit")
+    public BigDecimal setLimit(@PathVariable Long cashId, @RequestParam("limit") BigDecimal limit) {
+        return cashAccountService.setLimit(cashId, limit);
     }
 }

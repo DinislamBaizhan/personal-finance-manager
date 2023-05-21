@@ -26,10 +26,10 @@ spring:
   datasource:
     password: admin
     username: postgres
-    url: jdbc:postgresql://34.139.188.183:5432/fin_db
+    url: jdbc:postgresql://localhost:5432/fin_db
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate:
@@ -49,9 +49,9 @@ spring:
           starttls:
             enable: true
             required: true
-logging:
-  level:
-    root: "debug"
-    org.hibernate: "error"
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} [%level] %c{1.} [%t] %m%n"
+#logging:
+#  level:
+#    root: "debug"
+#    org.hibernate: "error"
+#  pattern:
+#    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} [%level] %c{1.} [%t] %m%n"

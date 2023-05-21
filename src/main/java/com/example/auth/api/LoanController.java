@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vi/loan")
+@RequestMapping("/api/v1/loan")
 @SecurityRequirement(name = "bearerAuth")
 public class LoanController {
 

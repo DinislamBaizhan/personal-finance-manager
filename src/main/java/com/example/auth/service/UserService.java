@@ -2,11 +2,15 @@ package com.example.auth.service;
 
 import com.example.auth.data.dto.RegisterDTO;
 import com.example.auth.data.dto.UserDTO;
+import com.example.auth.data.entity.CardAccount;
+import com.example.auth.data.entity.CashAccount;
+import com.example.auth.data.entity.Debt;
 import com.example.auth.data.entity.User;
+import com.example.auth.data.enums.DebtType;
 import com.example.auth.data.enums.Role;
 import com.example.auth.exception.DataNotFound;
+import com.example.auth.repository.DebtRepository;
 import com.example.auth.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -15,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -23,6 +29,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final DebtRepository debtRepository;
 
 
     public User getAuthenticatedProfile() {
@@ -39,14 +46,39 @@ public class UserService {
         return new UserDTO(
                 user.getFirstname(),
                 user.getLastname(),
-                user.getEmail()
+                user.getEmail(),
+                getSumOfAllMoney(
+                        user.getCardAccounts(),
+                        user.getCashAccounts()),
+                getAllDebtSum(user.getId())
         );
+    }
+
+    public BigDecimal getSumOfAllMoney(List<CardAccount> cardAccounts, List<CashAccount> cashAccounts) {
+        BigDecimal sum1 = cardAccounts.stream()
+                .map(CardAccount::getBalance)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal sum2 = cashAccounts.stream()
+                .map(CashAccount::getBalance)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return sum1.add(sum2);
+    }
+
+    public BigDecimal getAllDebtSum(Long userId) {
+        List<Debt> debts = debtRepository.findAllByDebtTypeAndUserIdAndActiveIsTrue(DebtType.CREDIT, userId);
+        return debts.stream()
+                .map(Debt::getIndebtedness)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public User findByEmail(String email) {
         return repository.findByEmail(email).orElseThrow(
                 () -> {
-                    log.error("user not found %s", email);
+                    log.error("user not found %s" + email);
                     return new DataNotFound("profile not found");
                 }
         );
@@ -57,7 +89,7 @@ public class UserService {
         try {
             return repository.save(profile);
         } catch (Exception e) {
-            throw new RuntimeException("fail to update password " + e.getCause());
+            throw new Exception("fail to update password " + e.getCause());
         }
     }
 
@@ -65,30 +97,8 @@ public class UserService {
         User user = getAuthenticatedProfile();
         user.setFirstname(name.get(0));
         user.setLastname(name.get(1));
-        log.info("rename: firstname - %s", name.get(0), "lastname - %s", name.get(1));
+        log.info("rename: firstname - %s" + name.get(0), "lastname - %s" + name.get(1));
         repository.save(user);
-        return getDTO();
-    }
-
-    public UserDTO addIcon(String link) throws JsonProcessingException {
-//        UserDTO DTO = objectMapper.readValue(link, UserDTO.class);
-        User user = getAuthenticatedProfile();
-        save(user);
-        log.info("add icon");
-        return getDTO();
-    }
-
-    public UserDTO addLanguage(String language) throws JsonProcessingException {
-//        UserDTO userDTO = objectMapper.readValue(language, UserDTO.class);
-        User user = getAuthenticatedProfile();
-        save(user);
-        return getDTO();
-    }
-
-    public UserDTO addColor(String color) throws JsonProcessingException {
-//        UserDTO userDTO = objectMapper.readValue(color, UserDTO.class);
-        User user = getAuthenticatedProfile();
-        save(user);
         return getDTO();
     }
 
@@ -118,12 +128,11 @@ public class UserService {
         }
     }
 
-
     public User save(User profile) {
         try {
             return repository.save(profile);
         } catch (DataAccessException e) {
-            log.error("fail save to database %s", profile);
+            log.error("fail save to database %s" + profile);
             throw new RuntimeException("fail save to database " + profile);
         }
     }

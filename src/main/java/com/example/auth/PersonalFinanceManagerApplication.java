@@ -9,9 +9,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 @Import(WebContainerConfig.class)
-public class AuthServerApplication {
+public class PersonalFinanceManagerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(AuthServerApplication.class, args);
+        SpringApplication.run(PersonalFinanceManagerApplication.class, args);
     }
 
 }

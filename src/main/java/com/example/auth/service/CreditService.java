@@ -5,8 +5,6 @@ import com.example.auth.data.entity.Expense;
 import com.example.auth.data.entity.User;
 import com.example.auth.data.enums.DebtType;
 import com.example.auth.repository.DebtRepository;
-import com.example.auth.repository.ExpenseRepository;
-import com.example.auth.repository.IncomeRepository;
 import com.example.auth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,8 +22,6 @@ import java.util.List;
 public class CreditService {
     private final UserRepository userRepository;
     private final DebtRepository debtRepository;
-    private final IncomeRepository incomeRepository;
-    private final ExpenseRepository expenseRepository;
     private final CardAccountService cardAccountService;
     private final CashAccountService cashAccountService;
 

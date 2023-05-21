@@ -11,7 +11,6 @@ import com.example.auth.data.response.AuthenticationResponse;
 import com.example.auth.repository.TokenRepository;
 import com.example.auth.repository.UserRepository;
 import com.example.auth.utils.DecodedToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +36,6 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final EmailService emailService;
-    private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final ConfirmationTokenService confirmationTokenService;
     private final ApplicationEventPublisher eventPublisher;
@@ -85,7 +82,7 @@ public class AuthenticationService {
         MailDetails mailDetails = new MailDetails(
                 email,
                 jwtToken,
-                buildEmail(user.getFirstname(), link, LocalDateTime.now().plusMinutes(30))
+                emailToResetPass(user.getFirstname(), link, LocalDateTime.now().plusMinutes(30))
         );
         eventPublisher.publishEvent(mailDetails);
     }

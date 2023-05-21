@@ -18,11 +18,11 @@ public class ConfirmationTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
     @Transactional
-    public ConfirmationToken saveConfirmationToken(User user) throws Exception {
+    public ConfirmationToken saveConfirmationToken(User user) {
         Optional<ConfirmationToken> token = confirmationTokenRepository.findByConfirmedIsFalseAndUserAndExpiresAtAfter(user, LocalDateTime.now());
 
         if (token.isPresent()) {
-            throw new Exception("Your email link is still active, try again in 15 minutes");
+            throw new IllegalArgumentException("Your email link is still active, try again in 15 minutes");
         } else {
             String randomUUID = UUID.randomUUID().toString();
 

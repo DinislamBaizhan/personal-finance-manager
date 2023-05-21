@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vi/credit")
+@RequestMapping("/api/v1/credit")
 @SecurityRequirement(name = "bearerAuth")
 public class CreditController {
 
@@ -60,17 +60,17 @@ public class CreditController {
     }
 
     @PostMapping("/{creditId}/repay")
-    @Operation(summary = "Repay a credit",description = "Repay a credit by credit ID")
+    @Operation(summary = "Repay a credit", description = "Repay a credit by credit ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Credit repaid successfully"),
             @ApiResponse(responseCode = "404", description = "Credit not found")
     })
-    public Debt repay(@RequestBody Expense expense,@Parameter(description = "ID of the credit") @PathVariable Long creditId) {
+    public Debt repay(@RequestBody Expense expense, @Parameter(description = "ID of the credit") @PathVariable Long creditId) {
         return creditService.repay(expense, creditId);
     }
 
     @PostMapping("/{creditId}/increase-credit")
-    @Operation(summary = "Increase credit amount",description = "Increase the credit amount by providing the credit ID and amount")
+    @Operation(summary = "Increase credit amount", description = "Increase the credit amount by providing the credit ID and amount")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Credit amount increased successfully"),
             @ApiResponse(responseCode = "404", description = "Credit not found")
@@ -80,7 +80,7 @@ public class CreditController {
     }
 
     @PatchMapping("/{creditId}/activity")
-    @Operation(summary = "Set credit activity status",description = "Set the activity status of a credit by providing the credit ID and status")
+    @Operation(summary = "Set credit activity status", description = "Set the activity status of a credit by providing the credit ID and status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Credit activity status updated successfully"),
             @ApiResponse(responseCode = "404", description = "Credit not found")

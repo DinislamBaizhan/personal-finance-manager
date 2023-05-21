@@ -20,41 +20,34 @@ import java.time.LocalDateTime;
         " if debitType == CREDIT: I pay debts to banks")
 public class Debt {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private DebtType debtType;
-
-    @Column(name = "created_at", nullable = false,
-            updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    protected boolean active = true;
-
-    @Column(nullable = false)
-    @Size(min = 3, max = 34, message = "account name must be between 3 and 34 characters long")
-    private String name;
-
-    @Column(nullable = false)
-    protected BigDecimal indebtedness;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
-
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
     public User user;
+    protected boolean active = true;
+    @Column(nullable = false)
+    protected BigDecimal indebtedness;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Enumerated(EnumType.STRING)
+    private DebtType debtType;
+    @Column(name = "created_at", nullable = false,
+            updatable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false)
+    @Size(min = 3, max = 34, message = "account name must be between 3 and 34 characters long")
+    private String name;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @PostLoad
     @PostUpdate
     @PostPersist
     public void checkIndebtedness() {
-        if (indebtedness.compareTo(BigDecimal.ZERO) <= 0.00) {
+        if (indebtedness.signum() <= 0) {
             active = false;
         }
     }

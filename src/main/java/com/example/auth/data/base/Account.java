@@ -10,11 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -29,7 +29,6 @@ public abstract class Account implements Serializable {
 
     @Column(name = "created_at", nullable = false,
             updatable = false)
-    @CreatedDate
     private LocalDate createdAt = LocalDate.now();
 
     @Column(nullable = false)
@@ -53,10 +52,13 @@ public abstract class Account implements Serializable {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
     private User user;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
+
+    @Column(name = "money_limit")
+    private BigDecimal moneyLimit;
 
     public void addMoney(BigDecimal money) {
         balance = balance.add(money);

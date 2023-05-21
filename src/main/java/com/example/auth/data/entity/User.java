@@ -15,6 +15,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,11 +56,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private BigDecimal sumOfAllMoney;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Token> tokens = new ArrayList<>();
 
-    //    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<CardAccount> cardAccounts = new ArrayList<>();
 

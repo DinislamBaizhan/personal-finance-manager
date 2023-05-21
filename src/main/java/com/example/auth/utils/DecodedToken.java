@@ -2,9 +2,10 @@ package com.example.auth.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.apache.tomcat.util.codec.binary.Base64;
 
-
+@Data
 public class DecodedToken {
     public String sub;
     public String name;
@@ -32,46 +33,6 @@ public class DecodedToken {
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.readValue(payload, DecodedToken.class);
-    }
-
-    public String getExp() {
-        return exp;
-    }
-
-    public void setExp(String exp) {
-        this.exp = exp;
-    }
-
-    public String getSub() {
-        return sub;
-    }
-
-    public void setSub(String sub) {
-        this.sub = sub;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Boolean getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
-    }
-
-    public Long getIat() {
-        return iat;
-    }
-
-    public void setIat(Long iat) {
-        this.iat = iat;
     }
 
 }
