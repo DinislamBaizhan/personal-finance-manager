@@ -49,9 +49,24 @@ spring:
           starttls:
             enable: true
             required: true
-#logging:
-#  level:
-#    root: "debug"
-#    org.hibernate: "error"
-#  pattern:
-#    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} [%level] %c{1.} [%t] %m%n"
+  management:
+    security:
+      enabled: false
+    endpoints:
+      health:
+        show-details: always
+        show-components: always
+      jmx:
+        exposure:
+          exclude: shutdown
+          include: "*"
+      web:
+        exposure:
+          exclude:
+          include: health, info, metrics
+logging:
+  level:
+    root: DEBUG
+    org.hibernate: ERROR
+  pattern:
+    console: "%black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable"
