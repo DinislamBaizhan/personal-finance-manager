@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/card-account")
-@Tag(name = "card account controller", description = "Card account management")
+@Tag(name = "Card account controller", description = "Card account management")
 @SecurityRequirement(name = "bearerAuth")
 public class CardAccountController {
     private final CardAccountService cardAccountService;
@@ -83,7 +83,9 @@ public class CardAccountController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Card account not found")
     })
-    public ResponseEntity<CardAccount> subtract(@RequestBody Expense expense, @RequestParam @Parameter(description = "ID of the category to assign to the expense") Long categoryId) {
+    public ResponseEntity<CardAccount> subtract(
+            @RequestBody Expense expense,
+            @RequestParam @Parameter(description = "ID of the category to assign to the expense") Long categoryId) {
         return ResponseEntity.ok(cardAccountService.subtractMoney(expense, categoryId));
     }
 
@@ -93,15 +95,19 @@ public class CardAccountController {
             @ApiResponse(responseCode = "200", description = "Successfully transfer"),
             @ApiResponse(responseCode = "404", description = "Card accounts not found")
     })
-    public ResponseEntity<CardAccount> transferAccounts(@PathVariable Long fromId,
-                                                        @PathVariable Long toId,
-                                                        @Parameter(description = "Type of the account") @RequestParam("accountType") AccountType accountType,
-                                                        @Parameter(description = "Amount to transfer") @RequestParam("amount") BigDecimal amount) {
+    public ResponseEntity<CardAccount> transferAccounts(
+            @Parameter(description = "Id of the account from which the money is transferred") @PathVariable Long fromId,
+            @Parameter(description = "Id of the account to which the money is being transferred") @PathVariable Long toId,
+            @Parameter(description = "Type of the account to transfer money from/to: CASH or CARD") @RequestParam("accountType") AccountType accountType,
+            @Parameter(description = "Amount of money to transfer") @RequestParam("amount") BigDecimal amount) {
         return ResponseEntity.ok(transferService.transferFromCardAccount(fromId, toId, accountType, amount));
     }
 
     @PatchMapping("/{cardId}/limit")
-    public BigDecimal setLimit(@PathVariable Long cardId, @RequestParam("limit") BigDecimal limit) {
+    @Operation(summary = "Set account limit")
+    public BigDecimal setLimit(
+            @Parameter(description = "id for cash account") @PathVariable Long cardId,
+            @Parameter(description = "Limit amount") @RequestParam("limit") BigDecimal limit) {
         return cardAccountService.setLimit(cardId, limit);
     }
 }

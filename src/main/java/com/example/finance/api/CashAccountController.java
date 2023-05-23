@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/cash-account")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Cash account controller", description = "Cash account management")
 public class CashAccountController {
 
     private final CashAccountService cashAccountService;
@@ -32,6 +34,7 @@ public class CashAccountController {
 
     @PostMapping
     @Operation(summary = "Create a new cash account")
+    @ApiResponse(responseCode = "201", description = "Card account successfully created")
     public ResponseEntity<CashAccount> save(@RequestBody CashAccount cashAccount) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cashAccountService.save(cashAccount));
     }
@@ -90,15 +93,19 @@ public class CashAccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully transferred money")
     })
-    public CashAccount transferAccounts(@PathVariable Long fromId,
-                                        @PathVariable Long toId,
-                                        @Parameter(description = "Type of the account to transfer money from/to") @RequestParam("accountType") AccountType accountType,
-                                        @Parameter(description = "Amount of money to transfer") @RequestParam("amount") BigDecimal amount) {
+    public CashAccount transferAccounts(
+            @Parameter(description = "Id of the account from which the money is transferred") @PathVariable Long fromId,
+            @Parameter(description = "Id of the account to which the money is being transferred") @PathVariable Long toId,
+            @Parameter(description = "Type of the account to transfer money from/to: CASH or CARD") @RequestParam("accountType") AccountType accountType,
+            @Parameter(description = "Amount of money to transfer") @RequestParam("amount") BigDecimal amount) {
         return transferService.transferFromCashAccount(fromId, toId, accountType, amount);
     }
 
     @PatchMapping("/{cashId}/limit")
-    public BigDecimal setLimit(@PathVariable Long cashId, @RequestParam("limit") BigDecimal limit) {
+    @Operation(summary = "Set account limit")
+    public BigDecimal setLimit(
+            @Parameter(description = "Id for cash account") @PathVariable Long cashId,
+            @Parameter(description = "Limit amount") @RequestParam("limit") BigDecimal limit) {
         return cashAccountService.setLimit(cashId, limit);
     }
 }

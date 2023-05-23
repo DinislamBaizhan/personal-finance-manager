@@ -17,7 +17,7 @@ public class SwaggerConfig {
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
-                .info(new Info().title("Finance")
+                .info(new Info().title("Personal finance manager")
                         .description("Приложение для управления личными финансами, " +
                                 "которое позволяет пользователю отслеживать свои расходы и доходы." +
                                 " Получать детальную информацию по своим финансам и статистику.")

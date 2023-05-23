@@ -1,6 +1,10 @@
 package com.example.finance.api;
 
 import com.example.finance.service.StatisticsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -21,10 +25,14 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/csv")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Transaction to csv controller", description = "csv management")
 public class CSVController {
     private final StatisticsService statisticsService;
 
     @GetMapping("/download-csv")
+    @Operation(summary = "Download", description = "Download transaction data in csv format.")
+    @ApiResponse(responseCode = "200", description = "File downloaded successfully.")
     public ResponseEntity<Resource> downloadCSV(
             @RequestParam("start") LocalDateTime start,
             @RequestParam("finish") LocalDateTime finish

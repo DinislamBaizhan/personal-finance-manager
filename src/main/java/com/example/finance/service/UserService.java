@@ -137,5 +137,4 @@ public class UserService {
             throw new RuntimeException("Failed to save to database: " + profile, e);
         }
     }
-
 }
