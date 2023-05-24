@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ConfirmationToken {
+public class ConfirmationToken implements Serializable {
 
     @SequenceGenerator(
             name = "confirmation_token_sequence",
@@ -41,7 +42,7 @@ public class ConfirmationToken {
     private boolean confirmed = false;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(
             nullable = false,
             name = "_user_id"

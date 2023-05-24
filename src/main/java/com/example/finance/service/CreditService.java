@@ -92,4 +92,13 @@ public class CreditService {
         debtRepository.save(debt);
         return debt.isActive();
     }
+
+    public void delete(Long creditId) {
+        Debt credit = getById(creditId);
+        try {
+            debtRepository.delete(credit);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

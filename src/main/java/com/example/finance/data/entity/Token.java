@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 
@@ -22,8 +20,7 @@ public class Token implements Serializable {
     public TokenType tokenType = TokenType.BEARER;
     public boolean revoked;
     public boolean expired;
-    @ManyToOne
-    @Cascade(CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     public User user;
     @Id

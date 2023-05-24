@@ -9,8 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -54,8 +52,7 @@ public class Transaction implements Serializable {
     private TransactionType transactionType;
 
     @JsonIgnore
-    @ManyToOne
-    @Cascade(CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "user_id")
     private User user;
 }

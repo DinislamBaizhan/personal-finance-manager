@@ -49,7 +49,7 @@ public abstract class Account implements Serializable {
     private String icon;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     private User user;
 

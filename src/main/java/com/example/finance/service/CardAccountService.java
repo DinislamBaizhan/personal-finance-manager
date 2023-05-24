@@ -84,4 +84,13 @@ public class CardAccountService {
         cardAccount.setMoneyLimit(limit);
         return cardAccountRepository.save(cardAccount).getMoneyLimit();
     }
+
+    public void delete(Long cardId) {
+        CardAccount cardAccount = getById(cardId);
+        try {
+            cardAccountRepository.delete(cardAccount);
+        } catch (Exception ex) {
+            throw new RuntimeException();
+        }
+    }
 }

@@ -115,4 +115,9 @@ public class LoanController {
     public boolean inactive(@Parameter(description = "ID of the loan") @PathVariable Long loanId, @Parameter(description = "condition of the status") @RequestParam boolean condition) {
         return creditService.setActivity(loanId, condition);
     }
+
+    @DeleteMapping("/{loanId}")
+    public void delete(@PathVariable Long loanId) {
+        loanService.delete(loanId);
+    }
 }

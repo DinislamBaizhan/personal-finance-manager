@@ -89,7 +89,12 @@ public class CreditController {
             @ApiResponse(responseCode = "200", description = "Credit activity status updated successfully"),
             @ApiResponse(responseCode = "404", description = "Credit not found")
     })
-    public boolean inactive(@Parameter(description = "ID of the credit") @PathVariable Long creditId, @Parameter(description = "Activity status") @RequestParam boolean status) {
+    public boolean inactive(@Parameter(description = "ID of the credit") @PathVariable Long creditId, @Parameter(description = "Activity status") @RequestParam("status") boolean status) {
         return creditService.setActivity(creditId, status);
+    }
+
+    @DeleteMapping("/{creditId}")
+    public void delete(@PathVariable Long creditId) {
+        creditService.delete(creditId);
     }
 }

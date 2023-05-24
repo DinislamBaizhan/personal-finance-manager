@@ -81,4 +81,13 @@ public class CashAccountService {
         cashAccount.setMoneyLimit(limit);
         return cashRepository.save(cashAccount).getMoneyLimit();
     }
+
+    public void delete(Long cashId) {
+        CashAccount cashAccount = getById(cashId);
+        try {
+            cashRepository.delete(cashAccount);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

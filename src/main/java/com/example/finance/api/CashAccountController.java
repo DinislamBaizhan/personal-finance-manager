@@ -108,4 +108,9 @@ public class CashAccountController {
             @Parameter(description = "Limit amount") @RequestParam("limit") BigDecimal limit) {
         return cashAccountService.setLimit(cashId, limit);
     }
+
+    @DeleteMapping("/{cashId}")
+    public void delete(@PathVariable Long cashId) {
+        cashAccountService.delete(cashId);
+    }
 }

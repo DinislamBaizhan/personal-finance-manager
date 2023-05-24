@@ -73,7 +73,9 @@ public class CardAccountController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Card account not found")
     })
-    public ResponseEntity<CardAccount> addMoney(@RequestBody Income income, @RequestParam @Parameter(description = "ID of the category to assign to the income") Long categoryId) {
+    public ResponseEntity<CardAccount> addMoney(
+            @RequestBody Income income,
+            @RequestParam @Parameter(description = "ID of the category to assign to the income") Long categoryId) {
         return ResponseEntity.ok(cardAccountService.addMoney(income, categoryId));
     }
 
@@ -109,5 +111,10 @@ public class CardAccountController {
             @Parameter(description = "id for cash account") @PathVariable Long cardId,
             @Parameter(description = "Limit amount") @RequestParam("limit") BigDecimal limit) {
         return cardAccountService.setLimit(cardId, limit);
+    }
+
+    @DeleteMapping()
+    public void delete(@RequestParam("cardId") Long cardId) {
+        cardAccountService.delete(cardId);
     }
 }

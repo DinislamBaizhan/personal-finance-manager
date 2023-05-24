@@ -17,5 +17,4 @@ public interface DebtRepository extends JpaRepository<Debt, Long> {
     List<Debt> findAllByDebtTypeAndUserIdAndActiveIsTrue(DebtType debtType, Long userId);
 
     List<Debt> findAllByDebtTypeAndUserIdAndActiveIsFalse(DebtType debtType, Long userId);
-
 }

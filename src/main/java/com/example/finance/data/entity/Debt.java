@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Description;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -18,10 +19,9 @@ import java.time.LocalDateTime;
 @Setter
 @Description("if debitType == LOAN: I am being paid for my debts" +
         " if debitType == CREDIT: I pay debts to banks")
-public class Debt {
-
+public class Debt implements Serializable {
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "user_id")
     public User user;
     protected boolean active = true;

@@ -85,5 +85,14 @@ public class LoanService {
         loan.addMoney(amount);
         return debtRepository.save(loan);
     }
+
+    public void delete(Long loanId) {
+        Debt loan = getById(loanId);
+        try {
+            debtRepository.delete(loan);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }
 

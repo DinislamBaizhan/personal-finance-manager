@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,6 +21,8 @@ public interface ConfirmationTokenRepository
     Optional<ConfirmationToken> findByToken(String token);
 
     Optional<ConfirmationToken> findByConfirmedIsFalseAndUserAndExpiresAtAfter(User user, LocalDateTime localDateTime);
+
+    List<ConfirmationToken> findAllByUser(User user);
 
     @Transactional
     @Modifying

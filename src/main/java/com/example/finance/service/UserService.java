@@ -2,15 +2,14 @@ package com.example.finance.service;
 
 import com.example.finance.data.dto.RegisterDTO;
 import com.example.finance.data.dto.UserDTO;
-import com.example.finance.data.entity.CardAccount;
-import com.example.finance.data.entity.CashAccount;
-import com.example.finance.data.entity.Debt;
-import com.example.finance.data.entity.User;
+import com.example.finance.data.entity.*;
 import com.example.finance.data.enums.DebtType;
 import com.example.finance.data.enums.Role;
+import com.example.finance.repository.ConfirmationTokenRepository;
 import com.example.finance.repository.DebtRepository;
 import com.example.finance.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -30,6 +29,8 @@ public class UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final DebtRepository debtRepository;
+    private final ConfirmationTokenService confirmationTokenService;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
 
     public User getAuthenticatedProfile() {
@@ -102,17 +103,6 @@ public class UserService {
         return getDTO();
     }
 
-    public void delete() {
-        User user = getAuthenticatedProfile();
-        try {
-            repository.delete(user);
-            log.info("profile deleted " + user.getEmail());
-        } catch (DataAccessException e) {
-            log.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
-            throw new EntityNotFoundException("profile not found " + e.getMessage());
-        }
-    }
-
     public User saveNewUser(RegisterDTO request) {
         User user = new User();
         user.setFirstname(request.getFirstname());
@@ -135,6 +125,20 @@ public class UserService {
         } catch (DataAccessException e) {
             log.error("Failed to save to database: " + profile, e);
             throw new RuntimeException("Failed to save to database: " + profile, e);
+        }
+    }
+
+    @Transactional
+    public void delete() {
+        User user = getAuthenticatedProfile();
+        try {
+            List<ConfirmationToken> token = confirmationTokenRepository.findAllByUser(user);
+            confirmationTokenRepository.deleteAll(token);
+            repository.delete(user);
+            log.info("profile deleted " + user.getEmail());
+        } catch (DataAccessException e) {
+            log.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
+            throw new EntityNotFoundException("profile not found " + e.getMessage());
         }
     }
 }

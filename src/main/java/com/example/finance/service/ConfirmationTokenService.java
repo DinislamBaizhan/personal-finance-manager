@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,10 +20,15 @@ public class ConfirmationTokenService {
 
     @Transactional
     public ConfirmationToken saveConfirmationToken(User user) {
-        Optional<ConfirmationToken> token = confirmationTokenRepository.findByConfirmedIsFalseAndUserAndExpiresAtAfter(user, LocalDateTime.now());
+        Optional<ConfirmationToken> token = confirmationTokenRepository
+                .findByConfirmedIsFalseAndUserAndExpiresAtAfter(user, LocalDateTime.now());
 
         if (token.isPresent()) {
-            throw new IllegalArgumentException("Your email link is still active, try again in 15 minutes");
+            LocalDateTime currentTime = LocalDateTime.now();
+            LocalDateTime tokenCreationTime = token.get().getCreatedAt();
+            long minutesDifference = ChronoUnit.MINUTES.between(tokenCreationTime, currentTime);
+            LocalDateTime differenceDateTime = currentTime.minusMinutes(minutesDifference);
+            throw new IllegalArgumentException("Your email link is still active, try again in " + differenceDateTime + " minutes");
         } else {
             String randomUUID = UUID.randomUUID().toString();
 
@@ -43,5 +49,10 @@ public class ConfirmationTokenService {
     public void setConfirmedAt(String token) {
         confirmationTokenRepository.updateConfirmedAt(
                 token, LocalDateTime.now());
+    }
+
+    @Transactional
+    public void delete() {
+        confirmationTokenRepository.deleteAll();
     }
 }

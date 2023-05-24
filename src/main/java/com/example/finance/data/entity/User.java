@@ -59,20 +59,23 @@ public class User implements UserDetails {
     private BigDecimal sumOfAllMoney;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Token> tokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE})
     private List<CardAccount> cardAccounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<CashAccount> cashAccounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Income> incomes = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private List<Transaction> transactions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Expense> expenseList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private List<Debt> debts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<ConfirmationToken> confirmationTokens = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
